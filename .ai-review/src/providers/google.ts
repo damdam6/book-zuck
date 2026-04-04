@@ -1,33 +1,34 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import type { LLMChatParams } from '../types.js';
-import { BaseLLMProvider } from './base.js';
+import type { LLMChatParams, LLMProvider } from '../types.js';
+import { withRetry } from './base.js';
 
-export class GoogleProvider extends BaseLLMProvider {
-  private genAI: GoogleGenerativeAI;
-
-  constructor(apiKey: string) {
-    super(apiKey);
-    this.genAI = new GoogleGenerativeAI(apiKey);
+export const createGoogle = (apiKey: string): LLMProvider => {
+  if (!apiKey) {
+    throw new Error('API key is required for Google');
   }
 
-  protected async doChat(params: LLMChatParams): Promise<string> {
-    const model = this.genAI.getGenerativeModel({
-      model: params.model,
-      systemInstruction: params.systemPrompt,
-    });
+  const genAI = new GoogleGenerativeAI(apiKey);
 
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: params.userMessage }] }],
-      generationConfig: {
-        temperature: params.temperature ?? 0.3,
-        maxOutputTokens: params.maxTokens ?? 4096,
-      },
-    });
+  return {
+    chat: withRetry(async (params: LLMChatParams) => {
+      const model = genAI.getGenerativeModel({
+        model: params.model,
+        systemInstruction: params.systemPrompt,
+      });
 
-    const text = result.response.text();
-    if (!text) {
-      throw new Error('Google returned empty response');
-    }
-    return text;
-  }
-}
+      const result = await model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: params.userMessage }] }],
+        generationConfig: {
+          temperature: params.temperature ?? 0.3,
+          maxOutputTokens: params.maxTokens ?? 4096,
+        },
+      });
+
+      const text = result.response.text();
+      if (!text) {
+        throw new Error('Google returned empty response');
+      }
+      return text;
+    }),
+  };
+};

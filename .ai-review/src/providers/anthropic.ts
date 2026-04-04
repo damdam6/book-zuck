@@ -1,30 +1,31 @@
 import Anthropic from '@anthropic-ai/sdk';
-import type { LLMChatParams } from '../types.js';
-import { BaseLLMProvider } from './base.js';
+import type { LLMChatParams, LLMProvider } from '../types.js';
+import { withRetry } from './base.js';
 
-export class AnthropicProvider extends BaseLLMProvider {
-  private client: Anthropic;
-
-  constructor(apiKey: string) {
-    super(apiKey);
-    this.client = new Anthropic({ apiKey });
+export const createAnthropic = (apiKey: string): LLMProvider => {
+  if (!apiKey) {
+    throw new Error('API key is required for Anthropic');
   }
 
-  protected async doChat(params: LLMChatParams): Promise<string> {
-    const response = await this.client.messages.create({
-      model: params.model,
-      system: params.systemPrompt,
-      messages: [
-        { role: 'user', content: params.userMessage },
-      ],
-      temperature: params.temperature ?? 0.3,
-      max_tokens: params.maxTokens ?? 4096,
-    });
+  const client = new Anthropic({ apiKey });
 
-    const block = response.content[0];
-    if (!block || block.type !== 'text') {
-      throw new Error('Anthropic returned empty response');
-    }
-    return block.text;
-  }
-}
+  return {
+    chat: withRetry(async (params: LLMChatParams) => {
+      const response = await client.messages.create({
+        model: params.model,
+        system: params.systemPrompt,
+        messages: [
+          { role: 'user', content: params.userMessage },
+        ],
+        temperature: params.temperature ?? 0.3,
+        max_tokens: params.maxTokens ?? 4096,
+      });
+
+      const block = response.content[0];
+      if (!block || block.type !== 'text') {
+        throw new Error('Anthropic returned empty response');
+      }
+      return block.text;
+    }),
+  };
+};

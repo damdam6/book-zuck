@@ -1,33 +1,34 @@
 import type { LLMChatParams, LLMProvider } from '../types.js';
+import { createKimi } from './kimi.js';
+import { createAnthropic } from './anthropic.js';
+import { createGoogle } from './google.js';
 
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 1000;
 
-export abstract class BaseLLMProvider implements LLMProvider {
-  protected apiKey: string;
+type ChatFn = (params: LLMChatParams) => Promise<string>;
 
-  constructor(apiKey: string) {
-    if (!apiKey) {
-      throw new Error(`API key is required for ${this.constructor.name}`);
-    }
-    this.apiKey = apiKey;
+const isRetryable = (error: unknown): boolean => {
+  if (error instanceof Error) {
+    const msg = error.message;
+    return msg.includes('rate limit') || msg.includes('429')
+      || msg.includes('timeout') || msg.includes('ETIMEDOUT');
   }
+  return false;
+};
 
-  async chat(params: LLMChatParams): Promise<string> {
+export const withRetry = (chatFn: ChatFn): ChatFn => {
+  return async (params) => {
     let lastError: Error | undefined;
 
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
-        return await this.doChat(params);
+        return await chatFn(params);
       } catch (error) {
         lastError = error as Error;
-        const isRateLimit = this.isRateLimitError(error);
-        const isTimeout = this.isTimeoutError(error);
-
-        if (!isRateLimit && !isTimeout) {
+        if (!isRetryable(error)) {
           throw error;
         }
-
         if (attempt < MAX_RETRIES - 1) {
           const delay = BASE_DELAY_MS * Math.pow(2, attempt);
           await new Promise((resolve) => setTimeout(resolve, delay));
@@ -36,42 +37,20 @@ export abstract class BaseLLMProvider implements LLMProvider {
     }
 
     throw lastError;
-  }
-
-  protected abstract doChat(params: LLMChatParams): Promise<string>;
-
-  protected isRateLimitError(error: unknown): boolean {
-    if (error instanceof Error) {
-      return error.message.includes('rate limit') || error.message.includes('429');
-    }
-    return false;
-  }
-
-  protected isTimeoutError(error: unknown): boolean {
-    if (error instanceof Error) {
-      return error.message.includes('timeout') || error.message.includes('ETIMEDOUT');
-    }
-    return false;
-  }
-}
+  };
+};
 
 export type ProviderName = 'kimi' | 'anthropic' | 'google';
 
-export async function createProvider(provider: ProviderName, apiKey: string): Promise<LLMProvider> {
+export const createProvider = (provider: ProviderName, apiKey: string): LLMProvider => {
   switch (provider) {
-    case 'kimi': {
-      const { KimiProvider } = await import('./kimi.js');
-      return new KimiProvider(apiKey);
-    }
-    case 'anthropic': {
-      const { AnthropicProvider } = await import('./anthropic.js');
-      return new AnthropicProvider(apiKey);
-    }
-    case 'google': {
-      const { GoogleProvider } = await import('./google.js');
-      return new GoogleProvider(apiKey);
-    }
+    case 'kimi':
+      return createKimi(apiKey);
+    case 'anthropic':
+      return createAnthropic(apiKey);
+    case 'google':
+      return createGoogle(apiKey);
     default:
       throw new Error(`Unknown provider: ${provider}`);
   }
-}
+};
