@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
+import { resolve } from 'node:path';
 import yaml from 'js-yaml';
 import type { AgentConfig, AppConfig } from './types.js';
 
@@ -36,7 +36,7 @@ function validateAgentConfig(name: string, config: unknown): AgentConfig {
     throw new Error(`Agent config for '${name}' is missing or invalid`);
   }
 
-  const validProviders = ['openai', 'anthropic', 'google'];
+  const validProviders = ['kimi', 'anthropic', 'google'];
   if (!validProviders.includes(c.provider as string)) {
     throw new Error(`Agent '${name}' has invalid provider: ${c.provider}. Must be one of: ${validProviders.join(', ')}`);
   }

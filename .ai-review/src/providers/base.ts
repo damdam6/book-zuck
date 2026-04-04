@@ -55,13 +55,13 @@ export abstract class BaseLLMProvider implements LLMProvider {
   }
 }
 
-export type ProviderName = 'openai' | 'anthropic' | 'google';
+export type ProviderName = 'kimi' | 'anthropic' | 'google';
 
 export async function createProvider(provider: ProviderName, apiKey: string): Promise<LLMProvider> {
   switch (provider) {
-    case 'openai': {
-      const { OpenAIProvider } = await import('./openai.js');
-      return new OpenAIProvider(apiKey);
+    case 'kimi': {
+      const { KimiProvider } = await import('./kimi.js');
+      return new KimiProvider(apiKey);
     }
     case 'anthropic': {
       const { AnthropicProvider } = await import('./anthropic.js');

@@ -2,12 +2,17 @@ import OpenAI from 'openai';
 import type { LLMChatParams } from '../types.js';
 import { BaseLLMProvider } from './base.js';
 
-export class OpenAIProvider extends BaseLLMProvider {
+const KIMI_BASE_URL = 'https://api.moonshot.ai/v1';
+
+export class KimiProvider extends BaseLLMProvider {
   private client: OpenAI;
 
   constructor(apiKey: string) {
     super(apiKey);
-    this.client = new OpenAI({ apiKey });
+    this.client = new OpenAI({
+      apiKey,
+      baseURL: KIMI_BASE_URL,
+    });
   }
 
   protected async doChat(params: LLMChatParams): Promise<string> {
@@ -23,7 +28,7 @@ export class OpenAIProvider extends BaseLLMProvider {
 
     const content = response.choices[0]?.message?.content;
     if (!content) {
-      throw new Error('OpenAI returned empty response');
+      throw new Error('Kimi returned empty response');
     }
     return content;
   }

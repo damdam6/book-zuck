@@ -1,7 +1,7 @@
 agents:
   quality:
-    provider: openai
-    model: gpt-4o
+    provider: kimi
+    model: kimi-k2.5
     prompt_file: prompts/quality.md
   performance:
     provider: anthropic
@@ -12,8 +12,8 @@ agents:
     model: gemini-2.5-flash
     prompt_file: prompts/security.md
   orchestrator:
-    provider: openai
-    model: gpt-4o
+    provider: kimi
+    model: kimi-k2.5
     prompt_file: prompts/orchestrator.md
   resolver:
     provider: anthropic
@@ -21,8 +21,8 @@ agents:
     prompt_file: prompts/resolver.md
     confidence_threshold: 0.8
   responder:
-    provider: openai
-    model: gpt-4o-mini
+    provider: kimi
+    model: kimi-k2.5
     prompt_file: prompts/responder.md
 
 triggers:

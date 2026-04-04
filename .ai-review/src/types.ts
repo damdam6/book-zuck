@@ -112,7 +112,7 @@ export interface ReviewThread {
 // ============================================
 
 export interface AgentConfig {
-  provider: 'openai' | 'anthropic' | 'google';
+  provider: 'kimi' | 'anthropic' | 'google';
   model: string;
   prompt_file: string;
   confidence_threshold?: number;
