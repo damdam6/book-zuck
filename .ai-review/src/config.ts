@@ -5,6 +5,8 @@ import type { AgentConfig, AppConfig } from './types.js';
 
 const CONFIG_FILENAME = '.ai-review.yml';
 
+const VALID_PROVIDERS = ['kimi', 'anthropic', 'google'] as const;
+
 const DEFAULT_OPTIONS = {
   language: 'ko',
   max_comments_per_review: 20,
@@ -19,8 +21,23 @@ const DEFAULT_TRIGGERS = {
   respond_to: '@review-bot',
 };
 
+// ============================================
+// Type Guards
+// ============================================
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isValidProvider(value: unknown): value is AgentConfig['provider'] {
+  return typeof value === 'string' && (VALID_PROVIDERS as readonly string[]).includes(value);
+}
+
+// ============================================
+// Internal
+// ============================================
+
 function findConfigPath(): string {
-  // GitHub Actions 환경에서는 GITHUB_WORKSPACE 사용
   const workspace = process.env.GITHUB_WORKSPACE || process.cwd();
   const configPath = resolve(workspace, CONFIG_FILENAME);
 
@@ -31,29 +48,31 @@ function findConfigPath(): string {
 }
 
 function validateAgentConfig(name: string, config: unknown): AgentConfig {
-  const c = config as Record<string, unknown>;
-  if (!c || typeof c !== 'object') {
+  if (!isRecord(config)) {
     throw new Error(`Agent config for '${name}' is missing or invalid`);
   }
 
-  const validProviders = ['kimi', 'anthropic', 'google'];
-  if (!validProviders.includes(c.provider as string)) {
-    throw new Error(`Agent '${name}' has invalid provider: ${c.provider}. Must be one of: ${validProviders.join(', ')}`);
+  if (!isValidProvider(config.provider)) {
+    throw new Error(`Agent '${name}' has invalid provider: ${config.provider}. Must be one of: ${VALID_PROVIDERS.join(', ')}`);
   }
-  if (!c.model || typeof c.model !== 'string') {
+  if (typeof config.model !== 'string' || !config.model) {
     throw new Error(`Agent '${name}' requires a model name`);
   }
-  if (!c.prompt_file || typeof c.prompt_file !== 'string') {
+  if (typeof config.prompt_file !== 'string' || !config.prompt_file) {
     throw new Error(`Agent '${name}' requires a prompt_file path`);
   }
 
   return {
-    provider: c.provider as AgentConfig['provider'],
-    model: c.model as string,
-    prompt_file: c.prompt_file as string,
-    confidence_threshold: typeof c.confidence_threshold === 'number' ? c.confidence_threshold : undefined,
+    provider: config.provider,
+    model: config.model,
+    prompt_file: config.prompt_file,
+    confidence_threshold: typeof config.confidence_threshold === 'number' ? config.confidence_threshold : undefined,
   };
 }
+
+// ============================================
+// Public API
+// ============================================
 
 export function loadPrompt(promptFile: string, baseDir: string): string {
   const promptPath = resolve(baseDir, promptFile);
@@ -66,36 +85,34 @@ export function loadPrompt(promptFile: string, baseDir: string): string {
 export function loadConfig(configPath?: string): AppConfig {
   const resolvedPath = configPath || findConfigPath();
   const raw = readFileSync(resolvedPath, 'utf-8');
-  const parsed = yaml.load(raw) as Record<string, unknown>;
+  const parsed = yaml.load(raw);
 
-  if (!parsed || typeof parsed !== 'object') {
+  if (!isRecord(parsed)) {
     throw new Error('Invalid config file: expected YAML object');
   }
 
-  const agents = parsed.agents as Record<string, unknown> | undefined;
-  if (!agents || typeof agents !== 'object') {
+  if (!isRecord(parsed.agents)) {
     throw new Error('Config must have an "agents" section');
   }
 
-  const requiredAgents = ['quality', 'performance', 'security', 'orchestrator', 'resolver', 'responder'] as const;
-  const validatedAgents = {} as Record<string, AgentConfig>;
-
-  for (const name of requiredAgents) {
-    validatedAgents[name] = validateAgentConfig(name, agents[name]);
-  }
-
-  const triggers = {
-    ...DEFAULT_TRIGGERS,
-    ...(parsed.triggers as Record<string, unknown> || {}),
+  const agentsRaw = parsed.agents;
+  const agents: AppConfig['agents'] = {
+    quality: validateAgentConfig('quality', agentsRaw.quality),
+    performance: validateAgentConfig('performance', agentsRaw.performance),
+    security: validateAgentConfig('security', agentsRaw.security),
+    orchestrator: validateAgentConfig('orchestrator', agentsRaw.orchestrator),
+    resolver: validateAgentConfig('resolver', agentsRaw.resolver),
+    responder: validateAgentConfig('responder', agentsRaw.responder),
   };
 
-  const options = {
-    ...DEFAULT_OPTIONS,
-    ...(parsed.options as Record<string, unknown> || {}),
-  };
+  const rawTriggers = isRecord(parsed.triggers) ? parsed.triggers : {};
+  const triggers = { ...DEFAULT_TRIGGERS, ...rawTriggers };
+
+  const rawOptions = isRecord(parsed.options) ? parsed.options : {};
+  const options = { ...DEFAULT_OPTIONS, ...rawOptions };
 
   return {
-    agents: validatedAgents as AppConfig['agents'],
+    agents,
     triggers: {
       review_on: Array.isArray(triggers.review_on) ? triggers.review_on : DEFAULT_TRIGGERS.review_on,
       resolve_on: Array.isArray(triggers.resolve_on) ? triggers.resolve_on : DEFAULT_TRIGGERS.resolve_on,
