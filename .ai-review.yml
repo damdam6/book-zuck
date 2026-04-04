@@ -1,0 +1,42 @@
+agents:
+  quality:
+    provider: kimi
+    model: kimi-k2.5
+    prompt_file: prompts/quality.md
+  performance:
+    provider: anthropic
+    model: claude-haiku-4-5
+    prompt_file: prompts/performance.md
+  security:
+    provider: google
+    model: gemini-2.5-flash
+    prompt_file: prompts/security.md
+  orchestrator:
+    provider: kimi
+    model: kimi-k2.5
+    prompt_file: prompts/orchestrator.md
+  resolver:
+    provider: anthropic
+    model: claude-haiku-4-5
+    prompt_file: prompts/resolver.md
+    confidence_threshold: 0.8
+  responder:
+    provider: kimi
+    model: kimi-k2.5
+    prompt_file: prompts/responder.md
+
+triggers:
+  review_on: [opened, reopened]
+  resolve_on: [synchronize]
+  respond_to: "@review-bot"
+
+options:
+  language: ko
+  max_comments_per_review: 20
+  review_draft_pr: false
+  skip_bot_prs: true
+  exclude_files:
+    - "*.lock"
+    - "*.generated.*"
+    - "dist/**"
+    - "node_modules/**"
