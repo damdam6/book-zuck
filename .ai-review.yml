@@ -1,28 +1,28 @@
 agents:
   quality:
-    provider: kimi
-    model: kimi-k2.5
+    provider: anthropic
+    model: claude-sonnet-4-6
     prompt_file: prompts/quality.md
   performance:
-    provider: anthropic
-    model: claude-haiku-4-5
-    prompt_file: prompts/performance.md
-  security:
-    provider: google
-    model: gemini-2.5-flash
-    prompt_file: prompts/security.md
-  orchestrator:
     provider: kimi
     model: kimi-k2.5
+    prompt_file: prompts/performance.md
+  security:
+    provider: anthropic
+    model: claude-opus-4-6
+    prompt_file: prompts/security.md
+  orchestrator:
+    provider: google
+    model: gemini-2.5-flash
     prompt_file: prompts/orchestrator.md
   resolver:
-    provider: anthropic
-    model: claude-haiku-4-5
+    provider: kimi
+    model: kimi-k2.5
     prompt_file: prompts/resolver.md
     confidence_threshold: 0.8
   responder:
-    provider: kimi
-    model: kimi-k2.5
+    provider: anthropic
+    model: claude-sonnet-4-6
     prompt_file: prompts/responder.md
 
 triggers:
