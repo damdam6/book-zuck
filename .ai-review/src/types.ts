@@ -89,11 +89,19 @@ export interface ResolverResult {
   reason: string;
 }
 
+export interface ResolverSummary {
+  resolved: number;
+  skipped: number;
+  failed: number;
+  details: ResolverResult[];
+}
+
 // ============================================
 // Thread (GraphQL)
 // ============================================
 
 export interface ThreadComment {
+  id: number;
   body: string;
   author: string;
 }
