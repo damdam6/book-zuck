@@ -44,6 +44,7 @@ export const runReviewAgent = async (
       temperature: params.temperature,
       maxTokens: params.maxTokens,
     });
+    console.log(`[Review Agent Response]\n${response}`);
 
     const parsed = parseJsonResponse<{ issues: Issue[] }>(response);
     if (!parsed || !Array.isArray(parsed.issues)) {

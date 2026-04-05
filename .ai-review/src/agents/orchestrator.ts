@@ -62,6 +62,7 @@ export const runOrchestrator = async (
       temperature,
       maxTokens,
     });
+    console.log(`[Orchestrator Response]\n${response}`);
 
     const parsed = parseJsonResponse<RawOrchestratorOutput>(response);
     if (!parsed || !Array.isArray(parsed.comments)) {

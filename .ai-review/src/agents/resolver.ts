@@ -73,6 +73,7 @@ export const runResolver = async (params: ResolverParams): Promise<ResolverSumma
         temperature: params.temperature,
         maxTokens: params.maxTokens,
       });
+      console.log(`[Resolver Response]\n${response}`);
 
       const result = parseJsonResponse<ResolverResult>(response);
       if (!result || typeof result.resolved !== 'boolean' || typeof result.confidence !== 'number') {

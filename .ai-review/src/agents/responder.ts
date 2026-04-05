@@ -75,6 +75,7 @@ export const runResponder = async (params: ResponderParams): Promise<string> => 
       temperature: params.temperature,
       maxTokens: params.maxTokens,
     });
+    console.log(`[Responder Response]\n${answer}`);
 
     return answer;
   } catch (error) {
