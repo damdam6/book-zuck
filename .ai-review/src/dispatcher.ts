@@ -113,9 +113,9 @@ const handleReview = async (
   // 3개 에이전트 병렬 실행
   console.log('Running review agents in parallel...');
   const [qualityIssues, perfIssues, securityIssues] = await Promise.all([
-    runQualityReview(qualityProvider, config.agents.quality.model, qualityPrompt, diff),
-    runPerformanceReview(perfProvider, config.agents.performance.model, perfPrompt, diff),
-    runSecurityReview(securityProvider, config.agents.security.model, securityPrompt, diff),
+    runQualityReview(qualityProvider, config.agents.quality.model, qualityPrompt, diff, config.agents.quality.temperature, config.agents.quality.max_tokens),
+    runPerformanceReview(perfProvider, config.agents.performance.model, perfPrompt, diff, config.agents.performance.temperature, config.agents.performance.max_tokens),
+    runSecurityReview(securityProvider, config.agents.security.model, securityPrompt, diff, config.agents.security.temperature, config.agents.security.max_tokens),
   ]);
 
   console.log(`Found issues - Quality: ${qualityIssues.length}, Performance: ${perfIssues.length}, Security: ${securityIssues.length}`);
@@ -126,7 +126,9 @@ const handleReview = async (
     config.agents.orchestrator.model,
     orchPrompt,
     { diff, qualityIssues, performanceIssues: perfIssues, securityIssues },
-    config.options.max_comments_per_review
+    config.options.max_comments_per_review,
+    config.agents.orchestrator.temperature,
+    config.agents.orchestrator.max_tokens
   );
 
   // 리뷰 게시
@@ -172,6 +174,8 @@ const handleResolve = async (
     model: config.agents.resolver.model,
     systemPrompt: prompt,
     confidenceThreshold: config.agents.resolver.confidence_threshold ?? 0.8,
+    temperature: config.agents.resolver.temperature,
+    maxTokens: config.agents.resolver.max_tokens,
     threads: botThreads,
     diff,
     graphql: graphqlFn,
@@ -214,6 +218,8 @@ const handleRespond = async (
     provider,
     model: config.agents.responder.model,
     systemPrompt: prompt,
+    temperature: config.agents.responder.temperature,
+    maxTokens: config.agents.responder.max_tokens,
     input: {
       commentBody: comment.body,
       commentId: comment.id,

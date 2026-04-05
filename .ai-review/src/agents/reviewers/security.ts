@@ -5,9 +5,11 @@ export const runSecurityReview = async (
   provider: LLMProvider,
   model: string,
   systemPrompt: string,
-  diff: DiffChunk[]
+  diff: DiffChunk[],
+  temperature?: number,
+  maxTokens?: number
 ): Promise<Issue[]> => {
-  const issues = await runReviewAgent(provider, { model, systemPrompt }, diff);
+  const issues = await runReviewAgent(provider, { model, systemPrompt, temperature, maxTokens }, diff);
 
   return issues.map((issue) => ({
     ...issue,

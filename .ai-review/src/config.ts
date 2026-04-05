@@ -66,6 +66,8 @@ function validateAgentConfig(name: string, config: unknown): AgentConfig {
     provider: config.provider,
     model: config.model,
     prompt_file: config.prompt_file,
+    temperature: typeof config.temperature === 'number' ? config.temperature : undefined,
+    max_tokens: typeof config.max_tokens === 'number' ? config.max_tokens : undefined,
     confidence_threshold: typeof config.confidence_threshold === 'number' ? config.confidence_threshold : undefined,
   };
 }

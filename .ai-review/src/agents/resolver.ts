@@ -17,6 +17,8 @@ interface ResolverParams {
   model: string;
   systemPrompt: string;
   confidenceThreshold: number;
+  temperature?: number;
+  maxTokens?: number;
   threads: ReviewThread[];
   diff: DiffChunk[];
   graphql: GraphqlFn;
@@ -68,6 +70,8 @@ export const runResolver = async (params: ResolverParams): Promise<ResolverSumma
         model: params.model,
         systemPrompt: params.systemPrompt,
         userMessage: buildUserMessage(originalComment, fileDiff),
+        temperature: params.temperature,
+        maxTokens: params.maxTokens,
       });
 
       const result = parseJsonResponse<ResolverResult>(response);
