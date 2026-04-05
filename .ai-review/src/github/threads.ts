@@ -10,6 +10,7 @@ interface ThreadNode {
   line: number | null;
   comments: {
     nodes: Array<{
+      databaseId: number;
       body: string;
       author: { login: string } | null;
     }>;
@@ -47,6 +48,7 @@ const THREADS_QUERY = `
             line
             comments(last: 5) {
               nodes {
+                databaseId
                 body
                 author { login }
               }
@@ -73,6 +75,7 @@ const toReviewThread = (node: ThreadNode): ReviewThread => ({
   path: node.path,
   line: node.line ?? 0,
   comments: node.comments.nodes.map((c) => ({
+    id: c.databaseId,
     body: c.body,
     author: c.author?.login ?? 'unknown',
   })),
