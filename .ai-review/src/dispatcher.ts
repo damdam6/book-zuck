@@ -265,7 +265,10 @@ const main = async (): Promise<void> => {
     if (action === 'opened' || action === 'reopened') {
       await handleReview(octokit, owner, repoName, pr.number);
     } else if (action === 'synchronize') {
+      // 1. 기존 리뷰 코멘트 해결 여부 판정
       await handleResolve(octokit, graphqlFn, owner, repoName, pr.number);
+      // 2. 새 커밋에 대한 신규 리뷰
+      await handleReview(octokit, owner, repoName, pr.number);
     }
   } else if (eventName === 'issue_comment' || eventName === 'pull_request_review_comment') {
     const payload = JSON.parse(payloadRaw) as CommentPayload;
