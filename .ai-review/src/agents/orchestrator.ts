@@ -81,7 +81,7 @@ export const runOrchestrator = async (
 
     // stats 계산
     const stats = {
-      total: kept.length,
+      total: sorted.length,
       critical: sorted.filter((c) => c.severity === 'critical').length,
       warning: sorted.filter((c) => c.severity === 'warning').length,
       info: sorted.filter((c) => c.severity === 'info').length,
