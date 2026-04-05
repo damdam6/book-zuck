@@ -4,7 +4,7 @@ description: >
   Staged 변경사항을 분석해서 적절한 git 커밋 메시지를 자동으로 생성하고 커밋까지 실행하는 스킬.
   "커밋 만들어줘", "staged 변경사항 커밋해줘", "git commit 해줘", "변경사항 정리해서 커밋",
   "commit message 작성해줘" 같은 요청이 오면 반드시 이 스킬을 사용할 것.
-allowed-tools: Bash(git diff*), Bash(git log*), Bash(git status*), Bash(git commit*)
+disable-model-invocation: true
 model: claude-opus-4-5
 ---
 
@@ -15,14 +15,6 @@ Staged 변경사항을 분석하고 의미 있는 커밋 메시지를 생성해 
 ## 설치 방법
 
 ### 전역 설치 (모든 프로젝트에서 `/git-commit` 사용)
-
-```bash
-mkdir -p ~/.claude/skills/git-commit
-curl -o ~/.claude/skills/git-commit/SKILL.md \
-  https://your-skill-url/SKILL.md
-```
-
-또는 직접 복사:
 
 ```bash
 mkdir -p ~/.claude/skills/git-commit
@@ -37,6 +29,21 @@ cp SKILL.md .claude/skills/git-commit/SKILL.md
 ```
 
 설치 후 Claude Code에서 `/git-commit` 입력하면 바로 실행된다.
+
+> **권한 설정**: git commit 권한 요청을 없애려면 Claude Code 세션에서 한 번 "항상 허용(Always allow)"을 선택하거나, 프로젝트 `.claude/settings.json`에 아래를 추가한다:
+>
+> ```json
+> {
+>   "permissions": {
+>     "allow": [
+>       "Bash(git diff*)",
+>       "Bash(git log*)",
+>       "Bash(git status*)",
+>       "Bash(git commit*)"
+>     ]
+>   }
+> }
+> ```
 
 ---
 
