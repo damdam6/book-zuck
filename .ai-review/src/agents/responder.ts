@@ -1,5 +1,6 @@
+import * as core from '@actions/core';
 import type { DiffChunk, LLMProvider } from '../types.js';
-import { formatDiffForLLM } from './reviewers/utils.js';
+import { formatDiffForLLM, sanitizeMarkdown } from './reviewers/utils.js';
 
 interface ResponderInput {
   commentBody: string;
@@ -9,11 +10,16 @@ interface ResponderInput {
   threadComments: string[];
 }
 
+const MAX_COMMENT_LENGTH = 4000;
+
 export const extractQuestion = (body: string, trigger: string): string | null => {
   if (!body.includes(trigger)) {
     return null;
   }
-  return body.replace(trigger, '').trim();
+  const question = body.replaceAll(trigger, '').trim();
+  return question.length > MAX_COMMENT_LENGTH
+    ? question.slice(0, MAX_COMMENT_LENGTH) + '...(truncated)'
+    : question;
 };
 
 export const buildContext = (input: ResponderInput, diff: DiffChunk[]): string => {
@@ -65,7 +71,7 @@ export const runResponder = async (params: ResponderParams): Promise<string> => 
   }
 
   const context = buildContext(params.input, params.diff);
-  const userMessage = `## 질문\n${question}\n\n${context}`;
+  const userMessage = `## 질문\n<user_comment>\n${question}\n</user_comment>\n\n${context}`;
 
   try {
     const answer = await params.provider.chat({
@@ -76,9 +82,9 @@ export const runResponder = async (params: ResponderParams): Promise<string> => 
       maxTokens: params.maxTokens,
     });
 
-    return answer;
+    return sanitizeMarkdown(answer);
   } catch (error) {
-    console.warn('Responder failed:', error);
+    core.warning(`Responder failed: ${error instanceof Error ? error.message : String(error)}`);
     return '죄송합니다, 답변 생성에 실패했습니다. 잠시 후 다시 시도해주세요.';
   }
 };
