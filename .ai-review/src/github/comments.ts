@@ -1,6 +1,9 @@
 import type { Octokit } from '@octokit/rest';
 import type { ReviewComment } from '../types.js';
 
+const toSide = (value: unknown): 'LEFT' | 'RIGHT' =>
+  value === 'LEFT' ? 'LEFT' : 'RIGHT';
+
 export const createReview = async (
   octokit: Octokit,
   owner: string,
@@ -44,7 +47,7 @@ export const getExistingBotComments = async (
       path: c.path,
       line: c.line ?? c.original_line ?? 0,
       body: c.body,
-      side: c.side as ReviewComment['side'],
+      side: toSide(c.side),
     }));
 };
 

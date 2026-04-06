@@ -4,6 +4,12 @@ import type { DiffChunk } from '../types.js';
 
 const MAX_PATCH_SIZE = 8000;
 
+const VALID_STATUSES = new Set<string>(['added', 'modified', 'removed', 'renamed']);
+const toDiffStatus = (value: unknown): DiffChunk['status'] =>
+  typeof value === 'string' && VALID_STATUSES.has(value)
+    ? (value as DiffChunk['status'])
+    : 'modified';
+
 const isExcluded = (filename: string, patterns: string[]): boolean =>
   patterns.some((pattern) => minimatch(filename, pattern));
 
@@ -44,7 +50,7 @@ export const getDiff = async (
     if (file.status === 'removed') continue;
     if (isExcluded(file.filename, excludePatterns)) continue;
 
-    const status = file.status as DiffChunk['status'];
+    const status = toDiffStatus(file.status);
 
     if (file.patch.length > MAX_PATCH_SIZE) {
       chunks.push(...splitByHunks(file.filename, file.patch, status, file.additions, file.deletions));

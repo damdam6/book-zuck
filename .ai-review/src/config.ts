@@ -87,7 +87,7 @@ export function loadPrompt(promptFile: string, baseDir: string): string {
 export function loadConfig(configPath?: string): AppConfig {
   const resolvedPath = configPath || findConfigPath();
   const raw = readFileSync(resolvedPath, 'utf-8');
-  const parsed = yaml.load(raw);
+  const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA });
 
   if (!isRecord(parsed)) {
     throw new Error('Invalid config file: expected YAML object');

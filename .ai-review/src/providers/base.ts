@@ -5,6 +5,7 @@ import { createGoogle } from './google.js';
 
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 1000;
+const LLM_TIMEOUT_MS = 60_000;
 
 type ChatFn = (params: LLMChatParams) => Promise<string>;
 
@@ -17,13 +18,23 @@ const isRetryable = (error: unknown): boolean => {
   return false;
 };
 
+const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> => {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`LLM call timed out after ${ms}ms`)), ms);
+    promise.then(
+      (val) => { clearTimeout(timer); resolve(val); },
+      (err) => { clearTimeout(timer); reject(err); },
+    );
+  });
+};
+
 export const withRetry = (chatFn: ChatFn): ChatFn => {
   return async (params) => {
     let lastError: Error | undefined;
 
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
-        return await chatFn(params);
+        return await withTimeout(chatFn(params), LLM_TIMEOUT_MS);
       } catch (error) {
         lastError = error as Error;
         if (!isRetryable(error)) {
