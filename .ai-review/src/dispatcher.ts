@@ -93,7 +93,7 @@ const handleReview = async (
   owner: string,
   repo: string,
   prNumber: number,
-  fetchExisting = false
+  fetchExistingBotComments = false
 ): Promise<void> => {
   const config = loadConfig();
   const aiReviewDir = getAiReviewDir();
@@ -107,7 +107,7 @@ const handleReview = async (
 
   // 기존 봇 코멘트 조회 (synchronize 이벤트에서만)
   let existingComments: ReviewComment[] = [];
-  if (fetchExisting) {
+  if (fetchExistingBotComments) {
     const botLogin = 'github-actions[bot]';
     existingComments = await getExistingBotComments(octokit, owner, repo, prNumber, botLogin);
     core.info(`Found ${existingComments.length} existing bot comments.`);
