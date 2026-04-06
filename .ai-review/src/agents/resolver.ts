@@ -101,6 +101,7 @@ export const runResolver = async (params: ResolverParams): Promise<ResolverSumma
 
         summary.resolved++;
       } else {
+        console.log(`[Resolver] Skipped thread ${thread.id}: resolved=${result.resolved}, confidence=${result.confidence}, reason=${result.reason}`);
         summary.skipped++;
       }
     } catch (error) {
