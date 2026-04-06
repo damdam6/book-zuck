@@ -5,7 +5,7 @@ import { loadConfig, loadPrompt, getAiReviewDir } from './config.js';
 import { createProvider } from './providers/base.js';
 import { getDiff } from './github/diff.js';
 import { createReview } from './github/comments.js';
-import { getUnresolvedThreads, filterBotThreads } from './github/threads.js';
+import { getUnresolvedThreads } from './github/threads.js';
 import { runQualityReview } from './agents/reviewers/quality.js';
 import { runPerformanceReview } from './agents/reviewers/performance.js';
 import { runSecurityReview } from './agents/reviewers/security.js';
@@ -157,10 +157,10 @@ const handleResolve = async (
   const aiReviewDir = getAiReviewDir();
 
   const threads = await getUnresolvedThreads(graphqlFn, owner, repo, prNumber);
-  const botThreads = filterBotThreads(threads, 'github-actions[bot]');
+  console.log(`Found ${threads.length} unresolved threads`);
 
-  if (botThreads.length === 0) {
-    console.log('No unresolved bot threads found.');
+  if (threads.length === 0) {
+    console.log('No unresolved threads found.');
     return;
   }
 
@@ -168,7 +168,7 @@ const handleResolve = async (
   const provider = createProvider(config.agents.resolver.provider, getApiKey(config.agents.resolver.provider));
   const prompt = loadPrompt(config.agents.resolver.prompt_file, aiReviewDir);
 
-  console.log(`Checking ${botThreads.length} unresolved threads...`);
+  console.log(`Checking ${threads.length} unresolved threads...`);
   const summary = await runResolver({
     provider,
     model: config.agents.resolver.model,
@@ -176,7 +176,7 @@ const handleResolve = async (
     confidenceThreshold: config.agents.resolver.confidence_threshold ?? 0.8,
     temperature: config.agents.resolver.temperature,
     maxTokens: config.agents.resolver.max_tokens,
-    threads: botThreads,
+    threads,
     diff,
     graphql: graphqlFn,
     octokit,
