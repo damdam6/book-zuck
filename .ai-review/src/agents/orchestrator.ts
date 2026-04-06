@@ -40,7 +40,9 @@ export const runOrchestrator = async (
   model: string,
   systemPrompt: string,
   input: OrchestratorInput,
-  maxComments: number
+  maxComments: number,
+  temperature?: number,
+  maxTokens?: number
 ): Promise<OrchestratorOutput> => {
   const diffText = formatDiffForLLM(input.diff);
 
@@ -57,6 +59,8 @@ export const runOrchestrator = async (
       model,
       systemPrompt,
       userMessage,
+      temperature,
+      maxTokens,
     });
 
     const parsed = parseJsonResponse<RawOrchestratorOutput>(response);

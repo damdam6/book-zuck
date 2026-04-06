@@ -51,6 +51,8 @@ interface ResponderParams {
   provider: LLMProvider;
   model: string;
   systemPrompt: string;
+  temperature?: number;
+  maxTokens?: number;
   input: ResponderInput;
   diff: DiffChunk[];
   trigger: string;
@@ -70,6 +72,8 @@ export const runResponder = async (params: ResponderParams): Promise<string> => 
       model: params.model,
       systemPrompt: params.systemPrompt,
       userMessage,
+      temperature: params.temperature,
+      maxTokens: params.maxTokens,
     });
 
     return answer;

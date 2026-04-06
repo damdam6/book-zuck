@@ -123,6 +123,8 @@ export interface AgentConfig {
   provider: 'kimi' | 'anthropic' | 'google';
   model: string;
   prompt_file: string;
+  temperature?: number;
+  max_tokens?: number;
   confidence_threshold?: number;
 }
 

@@ -31,7 +31,7 @@ export const formatDiffForLLM = (chunks: DiffChunk[]): string => {
 
 export const runReviewAgent = async (
   provider: LLMProvider,
-  params: { model: string; systemPrompt: string },
+  params: { model: string; systemPrompt: string; temperature?: number; maxTokens?: number },
   diff: DiffChunk[]
 ): Promise<Issue[]> => {
   const userMessage = formatDiffForLLM(diff);
@@ -41,6 +41,8 @@ export const runReviewAgent = async (
       model: params.model,
       systemPrompt: params.systemPrompt,
       userMessage,
+      temperature: params.temperature,
+      maxTokens: params.maxTokens,
     });
 
     const parsed = parseJsonResponse<{ issues: Issue[] }>(response);
