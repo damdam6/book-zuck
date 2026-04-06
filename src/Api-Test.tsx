@@ -23,7 +23,7 @@ export const ApiTest = () => {
 
   return (
     <div>
-      <h2>book List</h2>
+      <h2>Book List</h2>
       <ul>
         {data?.map((book) => (
           <li key={book.id}>
@@ -31,7 +31,7 @@ export const ApiTest = () => {
           </li>
         ))}
       </ul>
-      <div>all books @dd</div>
+      <div>copyright @damdam6</div>
     </div>
   );
 };
