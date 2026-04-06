@@ -28,8 +28,20 @@ export const sanitizeMarkdown = (text: string): string => {
   let sanitized = text;
   // 외부 URL 이미지 태그 제거
   sanitized = sanitized.replace(/!\[[^\]]*\]\(https?:\/\/[^)]+\)/g, '');
-  // raw HTML 태그 제거
-  sanitized = sanitized.replace(/<[^>]+>/g, '');
+
+  // 코드 블록 보존: fenced + inline code를 placeholder로 치환
+  const codeBlocks: string[] = [];
+  sanitized = sanitized.replace(/```[\s\S]*?```|`[^`]+`/g, (match) => {
+    codeBlocks.push(match);
+    return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+  });
+
+  // 실제 HTML 태그만 제거 (코드 블록 외부)
+  sanitized = sanitized.replace(/<\/?[a-zA-Z][a-zA-Z0-9]*[^>]*>/g, '');
+
+  // 코드 블록 복원
+  sanitized = sanitized.replace(/__CODE_BLOCK_(\d+)__/g, (_, idx) => codeBlocks[Number(idx)]);
+
   // 길이 제한
   if (sanitized.length > MAX_OUTPUT_LENGTH) {
     sanitized = sanitized.slice(0, MAX_OUTPUT_LENGTH) + '\n\n...(truncated)';
