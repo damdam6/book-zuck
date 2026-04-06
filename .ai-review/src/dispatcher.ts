@@ -27,17 +27,20 @@ const getEnvOrThrow = (name: string): string => {
   return value;
 };
 
+const API_KEY_MAP: Record<string, string> = {
+  kimi: 'KIMI_API_KEY',
+  anthropic: 'ANTHROPIC_API_KEY',
+  google: 'GOOGLE_API_KEY',
+};
+
 const getApiKey = (provider: string): string => {
-  const keyMap: Record<string, string> = {
-    kimi: 'KIMI_API_KEY',
-    anthropic: 'ANTHROPIC_API_KEY',
-    google: 'GOOGLE_API_KEY',
-  };
-  const envName = keyMap[provider];
+  const envName = API_KEY_MAP[provider];
   if (!envName) {
     throw new Error(`Unknown provider: ${provider}`);
   }
-  return getEnvOrThrow(envName);
+  const key = getEnvOrThrow(envName);
+  core.setSecret(key);
+  return key;
 };
 
 // ============================================
@@ -249,9 +252,10 @@ const main = async (): Promise<void> => {
   const eventPath = getEnvOrThrow('GITHUB_EVENT_PATH');
   const token = getEnvOrThrow('GITHUB_TOKEN');
 
-  // API 키를 시크릿으로 등록하여 로그에서 자동 마스킹
+  // 시크릿을 즉시 등록하여 로그에서 자동 마스킹
+  // (getApiKey에서도 중복 등록하여 새 프로바이더 누락 방지)
   core.setSecret(token);
-  for (const envName of ['KIMI_API_KEY', 'ANTHROPIC_API_KEY', 'GOOGLE_API_KEY']) {
+  for (const envName of Object.values(API_KEY_MAP)) {
     const key = process.env[envName];
     if (key) core.setSecret(key);
   }
