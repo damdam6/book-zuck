@@ -83,7 +83,7 @@ export const runOrchestrator = async (
 
     const parsed = parseJsonResponse<RawOrchestratorOutput>(response);
     if (!parsed || !Array.isArray(parsed.comments)) {
-      core.warning('Failed to parse orchestrator response');
+      core.warning(`[Orchestrator] Failed to parse response (model: ${model})`);
       return {
         summary: 'Failed to generate review summary.',
         comments: [],
@@ -123,7 +123,7 @@ export const runOrchestrator = async (
       stats,
     };
   } catch (error) {
-    core.warning(`Orchestrator failed: ${error instanceof Error ? error.message : String(error)}`);
+    core.warning(`[Orchestrator] Agent failed (model: ${model}): ${error instanceof Error ? error.message : String(error)}`);
     return {
       summary: 'Failed to generate review summary.',
       comments: [],

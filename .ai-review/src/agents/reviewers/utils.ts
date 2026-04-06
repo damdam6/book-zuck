@@ -46,6 +46,7 @@ export const formatDiffForLLM = (chunks: DiffChunk[]): string => {
 };
 
 export const runReviewAgent = async (
+  agentName: string,
   provider: LLMProvider,
   params: { model: string; systemPrompt: string; temperature?: number; maxTokens?: number },
   diff: DiffChunk[]
@@ -63,13 +64,13 @@ export const runReviewAgent = async (
 
     const parsed = parseJsonResponse<{ issues: Issue[] }>(response);
     if (!parsed || !Array.isArray(parsed.issues)) {
-      core.warning('Failed to parse review agent response, returning empty issues');
+      core.warning(`[${agentName}] Failed to parse response (model: ${params.model}), returning empty issues`);
       return [];
     }
 
     return parsed.issues;
   } catch (error) {
-    core.warning(`Review agent failed: ${error instanceof Error ? error.message : String(error)}`);
+    core.warning(`[${agentName}] Agent failed (model: ${params.model}): ${error instanceof Error ? error.message : String(error)}`);
     return [];
   }
 };

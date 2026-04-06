@@ -119,7 +119,7 @@ export const runResolver = async (
         try {
           await resolveThread(params.graphql, thread.id);
         } catch (resolveError) {
-          core.warning(`Failed to resolve thread ${thread.id}: ${resolveError instanceof Error ? resolveError.message : String(resolveError)}`);
+          core.warning(`[Resolver] Failed to resolve thread ${thread.id} (model: ${params.model}): ${resolveError instanceof Error ? resolveError.message : String(resolveError)}`);
           summary.failed++;
           continue;
         }
@@ -129,7 +129,7 @@ export const runResolver = async (
         summary.skipped++;
       }
     } catch (error) {
-      core.warning(`Failed to process thread ${thread.id}: ${error instanceof Error ? error.message : String(error)}`);
+      core.warning(`[Resolver] Failed to process thread ${thread.id} (model: ${params.model}): ${error instanceof Error ? error.message : String(error)}`);
       summary.failed++;
     }
   }

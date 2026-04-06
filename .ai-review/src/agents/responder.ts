@@ -84,7 +84,7 @@ export const runResponder = async (params: ResponderParams): Promise<string> => 
 
     return sanitizeMarkdown(answer);
   } catch (error) {
-    core.warning(`Responder failed: ${error instanceof Error ? error.message : String(error)}`);
+    core.warning(`[Responder] Agent failed (model: ${params.model}): ${error instanceof Error ? error.message : String(error)}`);
     return '죄송합니다, 답변 생성에 실패했습니다. 잠시 후 다시 시도해주세요.';
   }
 };
