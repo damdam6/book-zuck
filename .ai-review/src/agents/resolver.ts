@@ -1,3 +1,4 @@
+import * as core from "@actions/core";
 import type { Octokit } from "@octokit/rest";
 import type {
   DiffChunk,
@@ -8,7 +9,7 @@ import type {
 } from "../types.js";
 import { resolveThread } from "../github/threads.js";
 import { replyToComment } from "../github/comments.js";
-import { parseJsonResponse } from "./reviewers/utils.js";
+import { parseJsonResponse, sanitizeMarkdown } from "./reviewers/utils.js";
 
 type GraphqlFn = <T>(
   query: string,
@@ -36,14 +37,19 @@ const findDiffForFile = (
   path: string,
 ): DiffChunk | undefined => diff.find((chunk) => chunk.filename === path);
 
+const MAX_COMMENT_LENGTH = 4000;
+
+const sanitizeUserInput = (input: string): string =>
+  input.length > MAX_COMMENT_LENGTH ? input.slice(0, MAX_COMMENT_LENGTH) + '...(truncated)' : input;
+
 const buildUserMessage = (commentBody: string, fileDiff: DiffChunk): string =>
-  `## 원본 리뷰 코멘트\n${commentBody}\n\n## 해당 파일의 새로운 변경사항\n### File: ${fileDiff.filename}\n\`\`\`diff\n${fileDiff.patch}\n\`\`\``;
+  `## 원본 리뷰 코멘트\n<user_comment>\n${sanitizeUserInput(commentBody)}\n</user_comment>\n\n## 해당 파일의 새로운 변경사항\n### File: ${fileDiff.filename}\n\`\`\`diff\n${fileDiff.patch}\n\`\`\``;
 
 const formatReasonComment = (result: ResolverResult): string =>
   `🤖 **자동 해결 판정**\n\n` +
   `- **판정**: ${result.resolved ? "✅ 해결됨" : "❌ 미해결"}\n` +
   `- **확신도**: ${(result.confidence * 100).toFixed(0)}%\n` +
-  `- **근거**: ${result.reason}`;
+  `- **근거**: ${sanitizeMarkdown(result.reason)}`;
 
 export const runResolver = async (
   params: ResolverParams,
@@ -85,7 +91,9 @@ export const runResolver = async (
       if (
         !result ||
         typeof result.resolved !== "boolean" ||
-        typeof result.confidence !== "number"
+        typeof result.confidence !== "number" ||
+        result.confidence < 0 || result.confidence > 1 ||
+        typeof result.reason !== "string" || result.reason.length === 0
       ) {
         summary.failed++;
         continue;
@@ -107,18 +115,21 @@ export const runResolver = async (
           );
         }
 
-        // resolve 처리
-        await resolveThread(params.graphql, thread.id);
+        // resolve 처리 — 실패 시 코멘트만 남고 resolve 안 되는 상태 방지
+        try {
+          await resolveThread(params.graphql, thread.id);
+        } catch (resolveError) {
+          core.warning(`[Resolver] Failed to resolve thread ${thread.id} (model: ${params.model}): ${resolveError instanceof Error ? resolveError.message : String(resolveError)}`);
+          summary.failed++;
+          continue;
+        }
 
         summary.resolved++;
       } else {
-        console.log(
-          `[Resolver] Skipped thread ${thread.id}: resolved=${result.resolved}, confidence=${result.confidence}, reason=${result.reason}`,
-        );
         summary.skipped++;
       }
     } catch (error) {
-      console.warn(`Failed to process thread ${thread.id}:`, error);
+      core.warning(`[Resolver] Failed to process thread ${thread.id} (model: ${params.model}): ${error instanceof Error ? error.message : String(error)}`);
       summary.failed++;
     }
   }

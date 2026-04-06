@@ -1,3 +1,4 @@
+import * as core from '@actions/core';
 import type {
   LLMProvider,
   OrchestratorInput,
@@ -5,7 +6,7 @@ import type {
   ReviewComment,
   Severity,
 } from '../types.js';
-import { formatDiffForLLM, parseJsonResponse } from './reviewers/utils.js';
+import { formatDiffForLLM, parseJsonResponse, sanitizeMarkdown } from './reviewers/utils.js';
 
 const SEVERITY_PRIORITY: Record<Severity, number> = {
   critical: 0,
@@ -24,16 +25,33 @@ const limitComments = (comments: ReviewComment[], max: number): { kept: ReviewCo
   };
 };
 
+interface RawComment {
+  path: string;
+  line: number;
+  body: string;
+  severity: Severity;
+  side?: 'LEFT' | 'RIGHT';
+}
+
 interface RawOrchestratorOutput {
   summary: string;
-  comments: Array<{
-    path: string;
-    line: number;
-    body: string;
-    severity: Severity;
-    side?: 'LEFT' | 'RIGHT';
-  }>;
+  comments: RawComment[];
 }
+
+const VALID_SEVERITIES = new Set<string>(['critical', 'warning', 'info', 'nitpick']);
+const VALID_SIDES = new Set<string>(['LEFT', 'RIGHT']);
+
+const isValidComment = (c: unknown): c is RawComment => {
+  if (typeof c !== 'object' || c === null) return false;
+  const obj = c as Record<string, unknown>;
+  return (
+    typeof obj.path === 'string' && obj.path.length > 0 &&
+    typeof obj.line === 'number' && Number.isInteger(obj.line) && obj.line > 0 &&
+    typeof obj.body === 'string' && obj.body.length > 0 &&
+    typeof obj.severity === 'string' && VALID_SEVERITIES.has(obj.severity) &&
+    (obj.side === undefined || VALID_SIDES.has(obj.side as string))
+  );
+};
 
 export const runOrchestrator = async (
   provider: LLMProvider,
@@ -65,7 +83,7 @@ export const runOrchestrator = async (
 
     const parsed = parseJsonResponse<RawOrchestratorOutput>(response);
     if (!parsed || !Array.isArray(parsed.comments)) {
-      console.warn('Failed to parse orchestrator response');
+      core.warning(`[Orchestrator] Failed to parse response (model: ${model})`);
       return {
         summary: 'Failed to generate review summary.',
         comments: [],
@@ -73,8 +91,15 @@ export const runOrchestrator = async (
       };
     }
 
+    // 각 comment 유효성 검증 — 잘못된 항목은 필터링
+    const validComments = parsed.comments.filter((c) => {
+      if (isValidComment(c)) return true;
+      core.warning(`Dropped invalid orchestrator comment: ${JSON.stringify(c)}`);
+      return false;
+    });
+
     // severity 우선순위로 정렬
-    const sorted = [...parsed.comments].sort(
+    const sorted = [...validComments].sort(
       (a, b) => (SEVERITY_PRIORITY[a.severity] ?? 3) - (SEVERITY_PRIORITY[b.severity] ?? 3)
     );
 
@@ -93,12 +118,12 @@ export const runOrchestrator = async (
     };
 
     return {
-      summary: parsed.summary,
+      summary: sanitizeMarkdown(parsed.summary),
       comments: kept,
       stats,
     };
   } catch (error) {
-    console.warn('Orchestrator failed:', error);
+    core.warning(`[Orchestrator] Agent failed (model: ${model}): ${error instanceof Error ? error.message : String(error)}`);
     return {
       summary: 'Failed to generate review summary.',
       comments: [],

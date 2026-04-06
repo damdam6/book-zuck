@@ -9,7 +9,7 @@ export const runPerformanceReview = async (
   temperature?: number,
   maxTokens?: number
 ): Promise<Issue[]> => {
-  const issues = await runReviewAgent(provider, { model, systemPrompt, temperature, maxTokens }, diff);
+  const issues = await runReviewAgent('Performance', provider, { model, systemPrompt, temperature, maxTokens }, diff);
 
   return issues.map((issue) => ({
     ...issue,

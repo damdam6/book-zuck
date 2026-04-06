@@ -1,4 +1,7 @@
+import * as core from '@actions/core';
 import type { ReviewThread } from '../types.js';
+
+const MAX_PAGES = 10;
 
 type GraphqlFn = <T>(query: string, variables?: Record<string, unknown>) => Promise<T>;
 
@@ -89,6 +92,7 @@ export const getUnresolvedThreads = async (
 ): Promise<ReviewThread[]> => {
   const threads: ReviewThread[] = [];
   let cursor: string | null = null;
+  let page = 0;
 
   do {
     const data: ThreadsResponse = await graphql<ThreadsResponse>(THREADS_QUERY, {
@@ -104,6 +108,12 @@ export const getUnresolvedThreads = async (
       if (!node.isResolved) {
         threads.push(toReviewThread(node));
       }
+    }
+
+    page++;
+    if (page >= MAX_PAGES) {
+      core.warning(`Reached max pagination limit (${MAX_PAGES} pages). Some threads may not be fetched.`);
+      break;
     }
 
     cursor = connection.pageInfo.hasNextPage ? connection.pageInfo.endCursor : null;

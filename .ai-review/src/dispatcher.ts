@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import * as core from '@actions/core';
 import { Octokit } from '@octokit/rest';
 import { graphql } from '@octokit/graphql';
 import { loadConfig, loadPrompt, getAiReviewDir } from './config.js';
@@ -26,17 +27,20 @@ const getEnvOrThrow = (name: string): string => {
   return value;
 };
 
+const API_KEY_MAP: Record<string, string> = {
+  kimi: 'KIMI_API_KEY',
+  anthropic: 'ANTHROPIC_API_KEY',
+  google: 'GOOGLE_API_KEY',
+};
+
 const getApiKey = (provider: string): string => {
-  const keyMap: Record<string, string> = {
-    kimi: 'KIMI_API_KEY',
-    anthropic: 'ANTHROPIC_API_KEY',
-    google: 'GOOGLE_API_KEY',
-  };
-  const envName = keyMap[provider];
+  const envName = API_KEY_MAP[provider];
   if (!envName) {
     throw new Error(`Unknown provider: ${provider}`);
   }
-  return getEnvOrThrow(envName);
+  const key = getEnvOrThrow(envName);
+  core.setSecret(key);
+  return key;
 };
 
 // ============================================
@@ -95,7 +99,7 @@ const handleReview = async (
   // diff 추출
   const diff = await getDiff(octokit, owner, repo, prNumber, config.options.exclude_files);
   if (diff.length === 0) {
-    console.log('No reviewable files found. Skipping review.');
+    core.info('No reviewable files found. Skipping review.');
     return;
   }
 
@@ -110,15 +114,24 @@ const handleReview = async (
   const securityPrompt = loadPrompt(config.agents.security.prompt_file, aiReviewDir);
   const orchPrompt = loadPrompt(config.agents.orchestrator.prompt_file, aiReviewDir);
 
-  // 3개 에이전트 병렬 실행
-  console.log('Running review agents in parallel...');
-  const [qualityIssues, perfIssues, securityIssues] = await Promise.all([
+  // 3개 에이전트 병렬 실행 (개별 실패가 전체를 중단하지 않도록 allSettled 사용)
+  const results = await Promise.allSettled([
     runQualityReview(qualityProvider, config.agents.quality.model, qualityPrompt, diff, config.agents.quality.temperature, config.agents.quality.max_tokens),
     runPerformanceReview(perfProvider, config.agents.performance.model, perfPrompt, diff, config.agents.performance.temperature, config.agents.performance.max_tokens),
     runSecurityReview(securityProvider, config.agents.security.model, securityPrompt, diff, config.agents.security.temperature, config.agents.security.max_tokens),
   ]);
 
-  console.log(`Found issues - Quality: ${qualityIssues.length}, Performance: ${perfIssues.length}, Security: ${securityIssues.length}`);
+  const extractResult = <T>(r: PromiseSettledResult<T>, name: string, fallback: T): T => {
+    if (r.status === 'fulfilled') return r.value;
+    core.warning(`${name} agent failed: ${r.reason instanceof Error ? r.reason.message : String(r.reason)}`);
+    return fallback;
+  };
+
+  const qualityIssues = extractResult(results[0], 'Quality', []);
+  const perfIssues = extractResult(results[1], 'Performance', []);
+  const securityIssues = extractResult(results[2], 'Security', []);
+
+  core.info(`Found issues - Quality: ${qualityIssues.length}, Performance: ${perfIssues.length}, Security: ${securityIssues.length}`);
 
   // Orchestrator로 결과 병합
   const result = await runOrchestrator(
@@ -134,12 +147,10 @@ const handleReview = async (
   // 리뷰 게시
   if (result.comments.length > 0) {
     await createReview(octokit, owner, repo, prNumber, result.comments, result.summary);
-    console.log(`Posted review with ${result.comments.length} comments.`);
+    core.info(`Posted review with ${result.comments.length} comments.`);
   } else {
-    console.log('No issues to report.');
+    core.info('No issues to report.');
   }
-
-  console.log(`Stats: ${JSON.stringify(result.stats)}`);
 };
 
 // ============================================
@@ -157,10 +168,9 @@ const handleResolve = async (
   const aiReviewDir = getAiReviewDir();
 
   const threads = await getUnresolvedThreads(graphqlFn, owner, repo, prNumber);
-  console.log(`Found ${threads.length} unresolved threads`);
 
   if (threads.length === 0) {
-    console.log('No unresolved threads found.');
+    core.info('No unresolved threads found.');
     return;
   }
 
@@ -168,7 +178,7 @@ const handleResolve = async (
   const provider = createProvider(config.agents.resolver.provider, getApiKey(config.agents.resolver.provider));
   const prompt = loadPrompt(config.agents.resolver.prompt_file, aiReviewDir);
 
-  console.log(`Checking ${threads.length} unresolved threads...`);
+  core.info(`Checking ${threads.length} unresolved threads...`);
   const summary = await runResolver({
     provider,
     model: config.agents.resolver.model,
@@ -185,7 +195,7 @@ const handleResolve = async (
     prNumber,
   });
 
-  console.log(`Resolver results - Resolved: ${summary.resolved}, Skipped: ${summary.skipped}, Failed: ${summary.failed}`);
+  core.info(`Resolver results - Resolved: ${summary.resolved}, Skipped: ${summary.skipped}, Failed: ${summary.failed}`);
 };
 
 // ============================================
@@ -205,7 +215,7 @@ const handleRespond = async (
 
   const question = extractQuestion(comment.body, trigger);
   if (!question) {
-    console.log('No bot mention detected. Skipping.');
+    core.info('No bot mention detected. Skipping.');
     return;
   }
 
@@ -213,7 +223,6 @@ const handleRespond = async (
   const provider = createProvider(config.agents.responder.provider, getApiKey(config.agents.responder.provider));
   const prompt = loadPrompt(config.agents.responder.prompt_file, aiReviewDir);
 
-  console.log('Generating response...');
   const answer = await runResponder({
     provider,
     model: config.agents.responder.model,
@@ -232,7 +241,6 @@ const handleRespond = async (
   });
 
   await replyToComment(octokit, owner, repo, prNumber, comment.id, answer);
-  console.log('Reply posted.');
 };
 
 // ============================================
@@ -244,12 +252,20 @@ const main = async (): Promise<void> => {
   const eventPath = getEnvOrThrow('GITHUB_EVENT_PATH');
   const token = getEnvOrThrow('GITHUB_TOKEN');
 
+  // 시크릿을 즉시 등록하여 로그에서 자동 마스킹
+  // (getApiKey에서도 중복 등록하여 새 프로바이더 누락 방지)
+  core.setSecret(token);
+  for (const envName of Object.values(API_KEY_MAP)) {
+    const key = process.env[envName];
+    if (key) core.setSecret(key);
+  }
+
   const octokit = new Octokit({ auth: token });
   const graphqlFn = graphql.defaults({ headers: { authorization: `token ${token}` } });
 
   const payloadRaw = readFileSync(eventPath, 'utf-8');
 
-  console.log(`Event: ${eventName}`);
+  core.info(`Event: ${eventName}`);
 
   if (eventName === 'pull_request') {
     const payload = JSON.parse(payloadRaw) as PullRequestPayload;
@@ -260,11 +276,11 @@ const main = async (): Promise<void> => {
     // Pre-flight filters
     const config = loadConfig();
     if (!config.options.review_draft_pr && pr.draft) {
-      console.log('Draft PR detected. Skipping.');
+      core.info('Draft PR detected. Skipping.');
       return;
     }
     if (config.options.skip_bot_prs && pr.user.type === 'Bot') {
-      console.log('Bot PR detected. Skipping.');
+      core.info('Bot PR detected. Skipping.');
       return;
     }
 
@@ -283,20 +299,26 @@ const main = async (): Promise<void> => {
 
     const owner = payload.repository.owner.login;
     const repoName = payload.repository.name;
+
+    // issue_comment 이벤트에서 PR이 아닌 일반 이슈 필터링
+    if (eventName === 'issue_comment' && !payload.issue?.pull_request) {
+      core.info('Comment is on a regular issue (not a PR). Skipping.');
+      return;
+    }
+
     const prNumber = payload.pull_request?.number ?? payload.issue?.number;
 
     if (!prNumber) {
-      console.log('Could not determine PR number. Skipping.');
+      core.warning('Could not determine PR number. Skipping.');
       return;
     }
 
     await handleRespond(octokit, owner, repoName, prNumber, payload.comment);
   } else {
-    console.log(`Unhandled event: ${eventName}`);
+    core.warning(`Unhandled event: ${eventName}`);
   }
 };
 
 main().catch((error) => {
-  console.error('Dispatcher failed:', error);
-  process.exit(1);
+  core.setFailed(error instanceof Error ? error.message : String(error));
 });
