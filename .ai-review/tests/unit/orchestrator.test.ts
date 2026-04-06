@@ -56,4 +56,32 @@ describe('runOrchestrator', () => {
     const result = await runOrchestrator(provider, 'model', 'prompt', mockInput, 20);
     expect(result.comments).toHaveLength(0);
   });
+
+  it('includes existing comments in LLM message when provided', async () => {
+    const response = JSON.stringify({ summary: '요약', comments: [] });
+    const provider = makeProvider(response);
+
+    const inputWithExisting: OrchestratorInput = {
+      ...mockInput,
+      existingComments: [
+        { path: 'src/app.ts', line: 1, body: 'existing comment' },
+      ],
+    };
+
+    await runOrchestrator(provider, 'model', 'prompt', inputWithExisting, 20);
+
+    const callArgs = (provider.chat as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(callArgs.userMessage).toContain('Existing Bot Review Comments');
+    expect(callArgs.userMessage).toContain('existing comment');
+  });
+
+  it('does not include existing comments section when none provided', async () => {
+    const response = JSON.stringify({ summary: '요약', comments: [] });
+    const provider = makeProvider(response);
+
+    await runOrchestrator(provider, 'model', 'prompt', mockInput, 20);
+
+    const callArgs = (provider.chat as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(callArgs.userMessage).not.toContain('Existing Bot Review Comments');
+  });
 });

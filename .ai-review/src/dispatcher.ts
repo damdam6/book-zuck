@@ -5,7 +5,8 @@ import { graphql } from '@octokit/graphql';
 import { loadConfig, loadPrompt, getAiReviewDir } from './config.js';
 import { createProvider } from './providers/base.js';
 import { getDiff } from './github/diff.js';
-import { createReview } from './github/comments.js';
+import { createReview, getExistingBotComments } from './github/comments.js';
+import type { ReviewComment } from './types.js';
 import { getUnresolvedThreads } from './github/threads.js';
 import { runQualityReview } from './agents/reviewers/quality.js';
 import { runPerformanceReview } from './agents/reviewers/performance.js';
@@ -91,7 +92,8 @@ const handleReview = async (
   octokit: Octokit,
   owner: string,
   repo: string,
-  prNumber: number
+  prNumber: number,
+  fetchExisting = false
 ): Promise<void> => {
   const config = loadConfig();
   const aiReviewDir = getAiReviewDir();
@@ -101,6 +103,14 @@ const handleReview = async (
   if (diff.length === 0) {
     core.info('No reviewable files found. Skipping review.');
     return;
+  }
+
+  // 기존 봇 코멘트 조회 (synchronize 이벤트에서만)
+  let existingComments: ReviewComment[] = [];
+  if (fetchExisting) {
+    const botLogin = 'github-actions[bot]';
+    existingComments = await getExistingBotComments(octokit, owner, repo, prNumber, botLogin);
+    core.info(`Found ${existingComments.length} existing bot comments.`);
   }
 
   // 각 에이전트의 provider + prompt 준비
@@ -138,7 +148,7 @@ const handleReview = async (
     orchProvider,
     config.agents.orchestrator.model,
     orchPrompt,
-    { diff, qualityIssues, performanceIssues: perfIssues, securityIssues },
+    { diff, qualityIssues, performanceIssues: perfIssues, securityIssues, existingComments },
     config.options.max_comments_per_review,
     config.agents.orchestrator.temperature,
     config.agents.orchestrator.max_tokens
@@ -289,8 +299,8 @@ const main = async (): Promise<void> => {
     } else if (action === 'synchronize') {
       // 1. 기존 리뷰 코멘트 해결 여부 판정
       await handleResolve(octokit, graphqlFn, owner, repoName, pr.number);
-      // 2. 새 커밋에 대한 신규 리뷰
-      await handleReview(octokit, owner, repoName, pr.number);
+      // 2. 새 커밋에 대한 신규 리뷰 (기존 코멘트 중복 방지)
+      await handleReview(octokit, owner, repoName, pr.number, true);
     }
   } else if (eventName === 'issue_comment' || eventName === 'pull_request_review_comment') {
     const payload = JSON.parse(payloadRaw) as CommentPayload;

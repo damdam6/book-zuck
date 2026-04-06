@@ -70,7 +70,12 @@ export const runOrchestrator = async (
     security: input.securityIssues,
   }, null, 2);
 
-  const userMessage = `## Code Diff\n${diffText}\n\n## Review Issues from Specialist Agents\n${issuesSummary}`;
+  let userMessage = `## Code Diff\n${diffText}\n\n## Review Issues from Specialist Agents\n${issuesSummary}`;
+
+  if (input.existingComments && input.existingComments.length > 0) {
+    const existingJson = JSON.stringify(input.existingComments, null, 2);
+    userMessage += `\n\n## Existing Bot Review Comments (Already Posted)\n${existingJson}`;
+  }
 
   try {
     const response = await provider.chat({
