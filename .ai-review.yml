@@ -5,7 +5,7 @@ agents:
     prompt_file: prompts/quality.md
   performance:
     provider: kimi
-    model: kimi-k2.5
+    model: kimi-k2-thinking
     prompt_file: prompts/performance.md
     temperature: 1
   security:
@@ -19,7 +19,7 @@ agents:
     max_tokens: 8192
   resolver:
     provider: kimi
-    model: kimi-k2.5
+    model: kimi-k2-thinking
     prompt_file: prompts/resolver.md
     temperature: 1
     confidence_threshold: 0.8
