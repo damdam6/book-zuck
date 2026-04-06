@@ -22,12 +22,15 @@ export const ApiTest = () => {
   }, []);
 
   return (
-    <ul>
-      {data?.map((book) => (
-        <li key={book.id}>
-          <strong>{book.title}</strong> — {book.author}
-        </li>
-      ))}
-    </ul>
+    <div>
+      <ul>
+        {data?.map((book) => (
+          <li key={book.id}>
+            <strong>{book.title}</strong> — {book.author}
+          </li>
+        ))}
+      </ul>
+      <div>test for the git action</div>
+    </div>
   );
 };
