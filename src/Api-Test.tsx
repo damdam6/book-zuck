@@ -30,7 +30,7 @@ export const ApiTest = () => {
           </li>
         ))}
       </ul>
-      <div>test for the git action</div>
+      <div>books</div>
     </div>
   );
 };
