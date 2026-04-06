@@ -53,6 +53,7 @@ export const runResolver = async (params: ResolverParams): Promise<ResolverSumma
       // 원본 코멘트 추출
       const originalComment = thread.comments[0]?.body;
       if (!originalComment) {
+        console.log(`[Resolver] Skipped thread ${thread.id}: no original comment`);
         summary.skipped++;
         continue;
       }
@@ -60,7 +61,7 @@ export const runResolver = async (params: ResolverParams): Promise<ResolverSumma
       // 해당 파일의 diff 찾기
       const fileDiff = findDiffForFile(params.diff, thread.path);
       if (!fileDiff) {
-        // 이번 커밋에서 해당 파일이 변경되지 않음
+        console.log(`[Resolver] Skipped thread ${thread.id}: no diff for file "${thread.path}"`);
         summary.skipped++;
         continue;
       }
@@ -101,6 +102,7 @@ export const runResolver = async (params: ResolverParams): Promise<ResolverSumma
 
         summary.resolved++;
       } else {
+        console.log(`[Resolver] Skipped thread ${thread.id}: resolved=${result.resolved}, confidence=${result.confidence}`);
         summary.skipped++;
       }
     } catch (error) {
