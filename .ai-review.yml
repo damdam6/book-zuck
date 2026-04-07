@@ -18,8 +18,8 @@ agents:
     prompt_file: prompts/orchestrator.md
     max_tokens: 8192
   resolver:
-    provider: kimi
-    model: kimi-k2-thinking
+    provider: anthropic
+    model: claude-sonnet-4-6
     prompt_file: prompts/resolver.md
     temperature: 1
     confidence_threshold: 0.8

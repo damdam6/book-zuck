@@ -63,6 +63,7 @@ export interface OrchestratorInput {
   qualityIssues: Issue[];
   performanceIssues: Issue[];
   securityIssues: Issue[];
+  existingComments?: ReviewComment[];
 }
 
 export interface ReviewStats {
