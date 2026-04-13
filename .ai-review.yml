@@ -4,8 +4,8 @@ agents:
     model: claude-sonnet-4-6
     prompt_file: prompts/quality.md
   performance:
-    provider: kimi
-    model: kimi-k2-thinking
+    provider: deepseek
+    model: deepseek-reasoner
     prompt_file: prompts/performance.md
     temperature: 1
   security:
@@ -19,7 +19,7 @@ agents:
     max_tokens: 8192
   resolver:
     provider: anthropic
-    model: claude-sonnet-4-6
+    model: claude-opus-4-6
     prompt_file: prompts/resolver.md
     temperature: 1
     confidence_threshold: 0.8
