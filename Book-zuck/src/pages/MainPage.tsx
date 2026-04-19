@@ -1,4 +1,4 @@
-import TheHeader from "../components/common/TheHeader";
+import TheHeader from "@/components/common/TheHeader";
 
 const MainPage = () => {
   return (
