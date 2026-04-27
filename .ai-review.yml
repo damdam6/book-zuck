@@ -1,0 +1,45 @@
+agents:
+  quality:
+    provider: anthropic
+    model: claude-sonnet-4-6
+    prompt_file: prompts/quality.md
+  performance:
+    provider: deepseek
+    model: deepseek-reasoner
+    prompt_file: prompts/performance.md
+    temperature: 1
+  security:
+    provider: anthropic
+    model: claude-opus-4-6
+    prompt_file: prompts/security.md
+  orchestrator:
+    provider: google
+    model: gemini-2.5-flash
+    prompt_file: prompts/orchestrator.md
+    max_tokens: 8192
+  resolver:
+    provider: anthropic
+    model: claude-opus-4-6
+    prompt_file: prompts/resolver.md
+    temperature: 1
+    confidence_threshold: 0.8
+  responder:
+    provider: anthropic
+    model: claude-sonnet-4-6
+    prompt_file: prompts/responder.md
+
+triggers:
+  review_on: [opened, reopened]
+  resolve_on: [synchronize]
+  respond_to: "@review-bot"
+
+options:
+  language: ko
+  max_comments_per_review: 20
+  review_draft_pr: false
+  skip_bot_prs: true
+  exclude_files:
+    - "*.lock"
+    - "*.generated.*"
+    - "dist/**"
+    - "node_modules/**"
