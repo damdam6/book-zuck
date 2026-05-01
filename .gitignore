@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 
 *.env
+
+# Claude Code (vault symlinks are machine-local)
+.claude/skills/
+.claude/agents/
