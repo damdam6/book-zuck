@@ -1,16 +1,16 @@
 agents:
   quality:
-    provider: anthropic
-    model: claude-sonnet-4-6
+    provider: deepseek
+    model: deepseek-v4-pro
     prompt_file: prompts/quality.md
   performance:
     provider: deepseek
-    model: deepseek-reasoner
+    model: deepseek-v4-pro
     prompt_file: prompts/performance.md
     temperature: 1
   security:
     provider: anthropic
-    model: claude-opus-4-6
+    model: claude-opus-4-7
     prompt_file: prompts/security.md
   orchestrator:
     provider: google
@@ -18,8 +18,8 @@ agents:
     prompt_file: prompts/orchestrator.md
     max_tokens: 8192
   resolver:
-    provider: anthropic
-    model: claude-opus-4-6
+    provider: deepseek
+    model: deepseek-v4-pro
     prompt_file: prompts/resolver.md
     temperature: 1
     confidence_threshold: 0.8
