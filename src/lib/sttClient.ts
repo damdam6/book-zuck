@@ -1,8 +1,12 @@
 // DEV-ONLY. `client_secret` is bundled into the browser via VITE_ env vars.
 // Move auth + transcribe + poll behind a server proxy before shipping.
 // See docs/rtzr-stt-api.md §9.3.
+//
+// CORS workaround: requests go through the Vite dev server proxy
+// (vite.config.ts → server.proxy["/rtzr"] → https://openapi.vito.ai).
+// Production builds will need a real backend proxy at the same path.
 
-const BASE = "https://openapi.vito.ai";
+const BASE = "/rtzr";
 
 let cached: { token: string; expireAt: number } | null = null;
 
@@ -38,6 +42,13 @@ export async function submitTranscribe(
   config: TranscribeConfig,
 ): Promise<string> {
   const token = await authenticate();
+  console.log("[stt] submit", {
+    fileName: file.name,
+    fileSize: file.size,
+    fileType: file.type,
+    config,
+    tokenPreview: token.slice(0, 12) + "…",
+  });
   const fd = new FormData();
   fd.append("file", file);
   fd.append("config", JSON.stringify(config));
@@ -46,10 +57,16 @@ export async function submitTranscribe(
     headers: { Authorization: `Bearer ${token}` },
     body: fd,
   });
+  const bodyText = await res.text();
+  console.log("[stt] submit response", {
+    status: res.status,
+    contentType: res.headers.get("content-type"),
+    body: bodyText,
+  });
   if (!res.ok) {
-    throw new Error(`submit failed: ${res.status} ${await res.text()}`);
+    throw new Error(`submit failed: ${res.status} — ${bodyText || "(empty body)"}`);
   }
-  const json = (await res.json()) as { id: string };
+  const json = JSON.parse(bodyText) as { id: string };
   return json.id;
 }
 
