@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: damdam6/ai-code-review-action@v1
+      - uses: damdam6/ai-code-review-action@v1.0.0
         with:
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
           google-api-key: ${{ secrets.GOOGLE_API_KEY }}
