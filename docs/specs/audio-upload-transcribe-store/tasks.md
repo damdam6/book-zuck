@@ -51,30 +51,30 @@ RLS(인증 사용자 자기 row SELECT)를 마이그레이션으로 작성한다
 
 ---
 
-### T3: Edge Function `_shared` 헬퍼 + 프로젝트 스캐폴딩
+### T3: 공용 로직(RTZR/R2/CORS/Supabase) — 자체완결형 함수에 인라인
 
-**설명:** `supabase/` 프로젝트 구조와 공용 헬퍼(`cors.ts`, `r2.ts`, `rtzr.ts`)를
-만든다. `rtzr.ts`는 참고 브랜치 `sttClient.ts`의 검증된 로직을 Deno env 기반으로
-이식한다(인증 캐시, transcribe 제출, 폴링). `r2.ts`는 S3 호환 presign(PUT)·get
-헬퍼를 제공한다.
+**설명:** 대시보드 복붙 배포(선택지 A)를 위해 별도 `_shared` 모듈 대신 각 함수에
+공용 로직을 인라인한다. 공용 로직: CORS/JSON 응답, env fail-fast, Supabase
+admin/getUser, R2 presign(PUT)·get, RTZR 인증 캐시·제출(FormData)·폴링·오류 매핑.
+RTZR 로직은 참고 브랜치 `sttClient.ts`의 검증된 흐름을 Deno env 기반으로 이식.
 
 **수용 기준:**
-- [ ] `_shared/cors.ts` 표준 CORS 헤더/프리플라이트 핸들러
-- [ ] `_shared/rtzr.ts`: `authenticate()`(토큰 캐시), `submitTranscribe(stream, config)`,
+- [ ] CORS 헤더/프리플라이트 처리
+- [ ] `authenticate()`(토큰 캐시), `submitTranscribeFile(blob, name, config)`,
       `pollTranscribe(id)` — Deno env에서 자격증명 읽기
-- [ ] `_shared/r2.ts`: `presignPut(key, contentType, expiresSec)`, `getObject(key)`
+- [ ] `presignPut(key, contentType, expiresSec)`, `getObject(key)` (S3 호환)
 - [ ] 시크릿 누락 시 즉시 실패(fail fast)
+- [ ] 각 함수가 외부 상대 import 없이 단독 배포 가능
 
 **검증:**
-- [ ] `supabase functions serve`로 import 에러 없이 부팅
-- [ ] 수동: `r2.presignPut`로 만든 URL에 PUT 성공, `getObject`로 다운로드 성공
+- [ ] `pnpm build`/`pnpm lint`는 프론트 한정 — 함수는 대시보드 배포 후 부팅 확인
+- [ ] 수동: presign URL에 PUT 성공, getObject로 다운로드 성공
 
 **의존성:** T1
-**파일:**
-- `supabase/functions/_shared/cors.ts`
-- `supabase/functions/_shared/rtzr.ts`
-- `supabase/functions/_shared/r2.ts`
-- `supabase/config.toml` (필요 시)
+**파일:** (T4~T6 함수 파일에 인라인)
+- `supabase/functions/stt-presign/index.ts`
+- `supabase/functions/stt-submit/index.ts`
+- `supabase/functions/stt-poll/index.ts`
 **규모:** M
 
 ---

@@ -36,7 +36,7 @@
 ```
 [T1] R2 버킷/CORS/자격증명 + Supabase 시크릿  ─┐
 [T2] transcriptions 마이그레이션 + 최소 RLS    ─┤
-[T3] Edge _shared 헬퍼 (cors/r2/rtzr) + 스캐폴딩 ┘
+[T3] 공용 로직(cors/r2/rtzr) 자체완결형 함수에 인라인 ┘
         │
         ├──▶ [T4] stt-presign (row 생성 + presigned PUT)
         │            │
@@ -62,7 +62,7 @@
 ### Phase 0: 기반
 - [ ] T1: R2 버킷·CORS·자격증명 + Supabase 시크릿 등록
 - [ ] T2: `transcriptions` 마이그레이션 + 최소 RLS
-- [ ] T3: Edge Function `_shared` 헬퍼 + supabase 프로젝트 스캐폴딩
+- [ ] T3: 공용 로직(cors/r2/rtzr/supabase)을 자체완결형 함수에 인라인
 
 ### 체크포인트: 기반
 - [ ] `supabase db push` 성공, 테이블·RLS 적용 확인

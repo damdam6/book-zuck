@@ -123,13 +123,10 @@ src/
   lib/
     supabaseClient.ts       → (기존) 공용 클라이언트 — 그대로 사용
 supabase/
-  functions/
-    stt-presign/index.ts    → 로그인 확인, R2 PUT용 presigned URL + 객체키 발급
-    stt-submit/index.ts     → R2에서 객체 다운로드, RTZR 인증, POST transcribe, row 삽입
-    stt-poll/index.ts       → 진행 중 작업 RTZR 폴링, row 갱신
-    _shared/r2.ts           → R2(S3 호환) 클라이언트: presign(PUT) + get(다운로드)
-    _shared/rtzr.ts         → RTZR 인증 + transcribe + poll 헬퍼 (서버 측, secret 보관)
-    _shared/cors.ts         → CORS 헤더
+  functions/                → 각 함수는 자체완결형(파일 1개) — 대시보드 복붙 배포용.
+    stt-presign/index.ts    → 로그인 확인, R2 PUT용 presigned URL + 객체키 발급, row 생성
+    stt-submit/index.ts     → R2에서 객체 다운로드, RTZR 제출(FormData), transcribing 전환
+    stt-poll/index.ts       → 진행 중 작업 RTZR 폴링, row 갱신 (cron 호출)
   migrations/
     NNNN_transcriptions.sql → 테이블 + 인덱스 + (추후) RLS 정책
     NNNN_cron_stt_poll.sql  → stt-poll pg_cron 스케줄
@@ -231,7 +228,7 @@ export function AudioStt() {
 그대로 반영하되, `import.meta.env`가 아니라 Deno env에서 자격 증명을 읽는다:
 
 ```ts
-// supabase/functions/_shared/rtzr.ts
+// supabase/functions/stt-submit/index.ts (자체완결형 — 공용 로직 인라인)
 const BASE = Deno.env.get("RTZR_BASE_URL") ?? "https://openapi.vito.ai";
 const clientId = Deno.env.get("RTZR_CLIENT_ID")!;
 const clientSecret = Deno.env.get("RTZR_CLIENT_SECRET")!;
