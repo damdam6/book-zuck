@@ -18,7 +18,7 @@ type Utterance = {
 
 const ALLOWED_EXT = ["mp4", "m4a", "mp3", "amr", "flac", "wav"];
 const MAX_SIZE = 200 * 1024 * 1024; // 200MB (Edge Function 메모리 한도 고려)
-const POLL_INTERVAL_MS = 3000;
+const POLL_INTERVAL_MS = 5000;
 
 const formatTimestamp = (ms: number) => {
   const totalSec = Math.floor(ms / 1000);
