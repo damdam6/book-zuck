@@ -14,7 +14,7 @@ agents:
     prompt_file: prompts/security.md
   orchestrator:
     provider: anthropic
-    model: claude-haiku-4-5
+    model: claude-opus-4-8
     prompt_file: prompts/orchestrator.md
     max_tokens: 8192
   resolver:
