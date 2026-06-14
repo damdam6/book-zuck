@@ -6,8 +6,17 @@
       "icon": "paintbrush.fill",
       "envCopy": "apps/main-web/.env.development.local",
       "devCmd": "pnpm main",
-      "linkPaths": [".claude/skills", ".claude/settings.local.json", ".kiro", ".figma-component-map", ".mai"],
+      "linkPaths": [
+        ".claude/skills",
+        ".claude/settings.local.json",
+        ".kiro",
+        ".figma-component-map",
+        ".mai"
+      ],
       "color": "Blue"
+    },
+    "book-zuck": {
+      "short": "BZ"
     }
   }
 }
