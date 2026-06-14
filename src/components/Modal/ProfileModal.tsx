@@ -1,5 +1,5 @@
 // src/components/Modal/ProfileModal.tsx
-import { supabase } from "@/lib/SupabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/hooks/useAuth";
 
 const ProfileModal = () => {
