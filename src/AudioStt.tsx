@@ -65,7 +65,7 @@ export function AudioStt() {
       if (error) return; // 일시 오류는 다음 tick에서 재시도
       if (data.status === "completed") {
         window.clearInterval(pollRef.current!);
-        setUtterances((data.utterances ?? []) as Utterance[]);
+        setUtterances(Array.isArray(data.utterances) ? data.utterances : []);
         setStatus("completed");
       } else if (data.status === "failed") {
         window.clearInterval(pollRef.current!);
