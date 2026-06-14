@@ -47,6 +47,100 @@
 }
 
 /* ──────────────────────────────────────────────────────────────
+   디자인 토큰 (design-tokens 스펙): neutral 램프 / 폰트 / radius
+   ────────────────────────────────────────────────────────────── */
+@theme {
+  /* neutral ramp — 정규화 10단계 (white/black은 Tailwind 기본) */
+  --color-neutral-50: #f3f3f3;
+  --color-neutral-100: #e6e6e6;
+  --color-neutral-200: #d9d9d9;
+  --color-neutral-300: #c4c4c4;
+  --color-neutral-400: #bebebe;
+  --color-neutral-500: #9c9c9c;
+  --color-neutral-600: #7b7b7b;
+  --color-neutral-700: #555555;
+  --color-neutral-800: #353535;
+
+  /* 폰트 패밀리 — 본문 Pretendard(=--font-sans), 추가 폰트는 font-* 유틸 */
+  --font-work: "Work Sans", sans-serif;
+  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-padauk: "Padauk", serif;
+  --font-sankofa: "Sankofa Display", cursive;
+
+  /* radius — shadcn sm/md/lg(=var(--radius)) 유지, 디자인 전용 추가 */
+  --radius-bar: 5px;
+  --radius-card: 20px;
+  --radius-search: 28px;
+  --radius-pill: 30px;
+}
+
+/* ──────────────────────────────────────────────────────────────
+   디자인 토큰: 타이포그래피 named styles → text-* 유틸 생성
+   (폰트 패밀리는 font-* 유틸로 별도 조합)
+   ────────────────────────────────────────────────────────────── */
+@theme {
+  --text-title: 64px;
+  --text-title--line-height: 77px;
+  --text-title--letter-spacing: -0.02em;
+  --text-title--font-weight: 700;
+
+  --text-display-quote: 64px;
+  --text-display-quote--line-height: 94px;
+  --text-display-quote--font-weight: 700;
+
+  --text-heading: 37px;
+  --text-heading--line-height: 44px;
+  --text-heading--letter-spacing: -0.02em;
+  --text-heading--font-weight: 600;
+
+  --text-subtitle: 37px;
+  --text-subtitle--line-height: 44px;
+  --text-subtitle--font-weight: 300;
+
+  --text-question: 36px;
+  --text-question--line-height: 43px;
+  --text-question--font-weight: 600;
+
+  --text-body-lg: 30px;
+  --text-body-lg--line-height: 48px;
+  --text-body-lg--font-weight: 300;
+
+  --text-chat: 22px;
+  --text-chat--line-height: 32px;
+  --text-chat--font-weight: 500;
+
+  --text-label: 20px;
+  --text-label--line-height: 24px;
+  --text-label--font-weight: 300;
+
+  --text-value: 20px;
+  --text-value--line-height: 23px;
+  --text-value--font-weight: 500;
+
+  --text-rating: 18px;
+  --text-rating--line-height: 22px;
+  --text-rating--font-weight: 500;
+
+  --text-caption: 16px;
+  --text-caption--line-height: 19px;
+  --text-caption--font-weight: 400;
+
+  --text-button: 25px;
+  --text-button--line-height: 1.5;
+  --text-button--letter-spacing: -0.02em;
+  --text-button--font-weight: 500;
+
+  --text-tab: 20px;
+  --text-tab--line-height: 1.5;
+  --text-tab--font-weight: 500;
+
+  --text-logo: 30px;
+  --text-logo--line-height: 1.5;
+  --text-logo--letter-spacing: -0.03em;
+  --text-logo--font-weight: 400;
+}
+
+/* ──────────────────────────────────────────────────────────────
    계층 3: shadcn semantic → Tailwind 유틸 브리지
    ────────────────────────────────────────────────────────────── */
 @theme inline {
@@ -104,7 +198,7 @@
   --card-foreground: #000000;
   --popover: #ffffff;
   --popover-foreground: #000000;
-  --primary: #f83c00; /* point */
+  --primary: #000000; /* 주요 액션 버튼 (강조/포인트는 point=#f83c00) */
   --primary-foreground: #ffffff;
   --secondary: #f1f1f1;
   --secondary-foreground: #000000;
@@ -125,7 +219,7 @@
   --chart-5: oklch(0.269 0 0);
   --sidebar: #f1f1f1;
   --sidebar-foreground: #000000;
-  --sidebar-primary: #f83c00;
+  --sidebar-primary: #000000;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #ffffff;
   --sidebar-accent-foreground: #000000;
