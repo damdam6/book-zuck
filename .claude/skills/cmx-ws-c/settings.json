@@ -1,0 +1,9 @@
+{
+  "_comment": "Auto-approve permissions for the cmx-ws-c skill. Place at <repo>/.claude/settings.local.json (personal, gitignored). If a settings file already exists, MERGE the 'allow' array — don't replace it.",
+  "permissions": {
+    "allow": [
+      "Bash(cmux workspace-action set-color:*)",
+      "Bash(cmux workspace-action clear-color:*)"
+    ]
+  }
+}

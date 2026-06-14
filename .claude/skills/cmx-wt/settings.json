@@ -1,0 +1,13 @@
+{
+  "_comment": "Auto-approve permissions for the cmx-wt skill. Place at <repo>/.claude/settings.local.json (personal, gitignored). If a settings file already exists, MERGE the 'allow' array — don't replace it.",
+  "permissions": {
+    "allow": [
+      "Bash(python3:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git config --get:*)",
+      "Bash(*/_shared/scripts/create-worktree.sh:*)",
+      "Bash(./scripts/open-terminal.sh:*)",
+      "Bash(.claude/skills/cmx-wt/scripts/open-terminal.sh:*)"
+    ]
+  }
+}

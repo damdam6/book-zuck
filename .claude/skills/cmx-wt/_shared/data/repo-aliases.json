@@ -1,0 +1,13 @@
+{
+  "_comment": "Repo identifier → per-repo config. Key is folder name (or org/repo for ambiguity). Value can be a string (repoSimple only, backward compat) or an object.",
+  "aliases": {
+    "monask-frontend": {
+      "short": "FE",
+      "icon": "paintbrush.fill",
+      "envCopy": "apps/main-web/.env.development.local",
+      "devCmd": "pnpm main",
+      "linkPaths": [".claude/skills", ".claude/settings.local.json", ".kiro", ".figma-component-map", ".mai"],
+      "color": "Blue"
+    }
+  }
+}
