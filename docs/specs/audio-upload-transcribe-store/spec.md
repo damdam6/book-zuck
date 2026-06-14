@@ -102,11 +102,12 @@ R2에 직접 PUT 한다(대용량 파일이 Edge Function을 통과하지 않음
 Edge Function은 실행 시간 제한이 짧다. `stt-submit`은 작업이 접수되면 즉시
 반환하고, `stt-poll`(cron)이 작업을 안정적으로 종료 상태까지 진행시킨다.
 
-**대용량 파일 주의:** RTZR `/v1/transcribe`는 multipart 파일 업로드만 받고 URL
-입력을 지원하지 않는다(문서 §3). 따라서 `stt-submit`이 R2에서 파일을 받아 RTZR로
-**스트리밍 전달**해야 한다. 1~1.5시간 압축 파일(~60~130MB)은 스트리밍으로 처리
-가능하나, 대형 WAV(수백 MB)는 Edge Function 메모리/시간 제한에 닿을 수 있다 →
-미해결 질문 참고.
+**파일 전달 방식:** RTZR `/v1/transcribe`는 multipart 파일 업로드만 받고 URL
+입력을 지원하지 않는다(문서 §3). `stt-submit`은 R2에서 파일을 받아 참고 브랜치
+`sttClient.ts`와 동일하게 **`FormData`에 파일을 통째로 담아** RTZR로 보낸다(RTZR가
+검증·지원하는 방식). 이 방식은 파일 전체를 메모리에 올리므로 Edge Function 메모리
+한도가 제약이다 → 긴 녹음은 압축 포맷(m4a/mp3) 권장 + 업로드 크기 상한으로 막는다.
+대형 WAV(수백 MB)는 한도 초과로 실패할 수 있다(허용 트레이드오프) → 미해결 질문 참고.
 
 ## 프로젝트 구조
 
@@ -280,10 +281,10 @@ const clientSecret = Deno.env.get("RTZR_CLIENT_SECRET")!;
 1. **UI 상태 전달:** **추후 결정(보류)** — v1은 단일 임시 화면이라 가장 단순한
    클라이언트 폴링(`transcriptions` row 주기 조회)으로 구현하고, Supabase Realtime
    구독 전환은 나중에 결정한다.
-2. **대용량 파일의 RTZR 전달:** RTZR가 URL 입력을 지원하지 않으므로 `stt-submit`이
-   R2 파일을 받아 스트리밍 전달해야 한다. 1.5시간 대형 WAV(수백 MB)에서 Edge
-   Function 메모리/시간 제한 검증 필요 — 한계 시 (a) 업로드 단계에서 권장 포맷/비트레이트
-   안내, (b) 별도 워커/청크 처리 검토. → PLAN에서 확정.
+2. **대용량 파일의 RTZR 전달:** `stt-submit`이 R2 파일을 받아 `FormData`로 통째로
+   전달(메모리 적재). 1.5시간 대형 WAV(수백 MB)에서 Edge Function 메모리 한도 검증
+   필요 — 한계 시 (a) 업로드 단계에서 권장 포맷/비트레이트 안내, (b) 별도 워커/청크
+   처리 검토. → 실제 배포 후 실측.
 3. **pg_cron 주기 & 배치:** 간격(예: 30초), tick당 최대 작업 수, `failed`로
    표시하기 전 작업당 최대 대기(API 문서상 ~30분 상한 제안).
 4. **RTZR `config` 기본값:** diarization on/off, `spk_count` 자동(0)? 참고 기본값

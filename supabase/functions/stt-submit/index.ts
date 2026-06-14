@@ -10,7 +10,7 @@ import { getObject } from "../_shared/r2.ts";
 import {
   friendlyMessage,
   RtzrError,
-  submitTranscribeStream,
+  submitTranscribeFile,
   type TranscribeConfig,
 } from "../_shared/rtzr.ts";
 
@@ -45,14 +45,13 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // R2에서 파일을 받아 RTZR로 통째로(FormData) 제출한다.
     const obj = await getObject(row.r2_object_key);
-    if (!obj.body) throw new Error("R2 객체 본문이 비어 있습니다.");
-    const contentType = obj.headers.get("content-type") ?? "application/octet-stream";
+    const file = await obj.blob();
 
-    const rtzrId = await submitTranscribeStream(
-      obj.body,
+    const rtzrId = await submitTranscribeFile(
+      file,
       row.file_name,
-      contentType,
       (row.config ?? {}) as TranscribeConfig,
     );
 

@@ -46,7 +46,7 @@ export async function presignPut(
   return signed.url;
 }
 
-/** 서버 측 객체 다운로드. 본문은 ReadableStream으로 그대로 스트리밍 가능. */
+/** 서버 측 객체 다운로드. 호출부에서 `.blob()` 등으로 본문을 읽는다. */
 export async function getObject(key: string): Promise<Response> {
   const res = await client().fetch(objectUrl(key), { method: "GET" });
   if (!res.ok) {

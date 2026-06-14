@@ -113,22 +113,22 @@ RLS(인증 사용자 자기 row SELECT)를 마이그레이션으로 작성한다
 
 ## Phase 2: 전사 파이프라인
 
-### T5: `stt-submit` Edge Function (R2 → RTZR 스트리밍 제출)
+### T5: `stt-submit` Edge Function (R2 → RTZR 파일 제출)
 
 **설명:** `transcriptionId`를 받아 R2에서 객체를 가져와 RTZR `/v1/transcribe`로
-**스트리밍 multipart 전달**하고, 반환된 `id`를 row에 저장하며 `status='transcribing'`로
-갱신한다.
+**`FormData`(파일 통째)로 제출**하고(참고 `sttClient.ts` 방식), 반환된 `id`를 row에
+저장하며 `status='transcribing'`로 갱신한다.
 
 **수용 기준:**
 - [ ] 요청: `{ transcriptionId }`; 소유자 확인(JWT의 uid == row.user_id)
-- [ ] R2 `getObject`로 스트림 확보 → RTZR로 스트리밍 전달(메모리 전체 버퍼링 회피)
+- [ ] R2 `getObject` → `blob()` → `FormData`에 담아 RTZR 제출
 - [ ] 성공 시 `rtzr_transcribe_id` 저장 + `status='transcribing'`
 - [ ] RTZR 오류(H0010/H0005/H0006 등) → `status='failed'` + `error_code/message` 매핑
 - [ ] 즉시 반환(폴링은 T6이 담당)
 
 **검증:**
 - [ ] 수동: T4 업로드 후 호출 → row가 `transcribing` + `rtzr_transcribe_id` 보유
-- [ ] 수동: 1시간 내외 음성으로 메모리/시간 한계 내 동작 실측(리스크 검증)
+- [ ] 수동: 1시간 내외 음성으로 메모리 한계 내 동작 실측(리스크 검증)
 
 **의존성:** T3, T4
 **파일:**

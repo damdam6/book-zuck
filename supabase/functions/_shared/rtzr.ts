@@ -67,75 +67,29 @@ export async function authenticate(): Promise<string> {
   return cached.token;
 }
 
-// 스트리밍 multipart 본문을 만들어 파일을 메모리에 전부 버퍼링하지 않고 전달한다.
-// (대용량 음성 대응 — 스펙 결정: "스트리밍 전달".)
-function buildMultipartBody(
-  fileStream: ReadableStream<Uint8Array>,
+/**
+ * 파일(Blob)을 RTZR로 제출하고 transcribe id를 반환.
+ * 참고 브랜치 sttClient.ts와 동일하게 FormData(multipart)에 파일을 통째로 담아 보낸다.
+ * (RTZR가 검증·지원하는 방식. Content-Length가 설정되어 chunked 거부 문제가 없다.)
+ *
+ * 주의: 파일 전체를 메모리에 올린다. Edge Function 메모리 한도가 있으므로 긴 녹음은
+ * 압축 포맷(m4a/mp3)을 권장하고 업로드 단계에서 크기 상한으로 막는다.
+ */
+export async function submitTranscribeFile(
+  file: Blob,
   fileName: string,
-  fileContentType: string,
-  config: TranscribeConfig,
-): { body: ReadableStream<Uint8Array>; boundary: string } {
-  const boundary = `----rtzr${crypto.randomUUID()}`;
-  const enc = new TextEncoder();
-
-  const preamble = enc.encode(
-    `--${boundary}\r\n` +
-      `Content-Disposition: form-data; name="config"\r\n\r\n` +
-      `${JSON.stringify(config)}\r\n` +
-      `--${boundary}\r\n` +
-      `Content-Disposition: form-data; name="file"; filename="${fileName}"\r\n` +
-      `Content-Type: ${fileContentType}\r\n\r\n`,
-  );
-  const epilogue = enc.encode(`\r\n--${boundary}--\r\n`);
-
-  const reader = fileStream.getReader();
-  const body = new ReadableStream<Uint8Array>({
-    start(controller) {
-      controller.enqueue(preamble);
-    },
-    async pull(controller) {
-      const { done, value } = await reader.read();
-      if (done) {
-        controller.enqueue(epilogue);
-        controller.close();
-        return;
-      }
-      controller.enqueue(value);
-    },
-    cancel(reason) {
-      reader.cancel(reason);
-    },
-  });
-
-  return { body, boundary };
-}
-
-/** R2에서 받은 파일 스트림을 RTZR로 제출하고 transcribe id를 반환. */
-export async function submitTranscribeStream(
-  fileStream: ReadableStream<Uint8Array>,
-  fileName: string,
-  fileContentType: string,
   config: TranscribeConfig = DEFAULT_CONFIG,
 ): Promise<string> {
   const token = await authenticate();
-  const { body, boundary } = buildMultipartBody(
-    fileStream,
-    fileName,
-    fileContentType,
-    config,
-  );
+
+  const fd = new FormData();
+  fd.append("file", file, fileName);
+  fd.append("config", JSON.stringify(config));
 
   const res = await fetch(`${baseUrl()}/v1/transcribe`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": `multipart/form-data; boundary=${boundary}`,
-      Accept: "application/json",
-    },
-    body,
-    // 스트리밍 요청 본문에 필요
-    // @ts-ignore Deno fetch는 duplex 옵션을 지원
-    duplex: "half",
+    headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+    body: fd, // Content-Type(boundary 포함)은 fetch가 자동 설정
   });
 
   const text = await res.text();
