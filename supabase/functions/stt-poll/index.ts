@@ -83,8 +83,9 @@ async function pollTranscribe(id: string): Promise<PollResponse> {
 }
 
 Deno.serve(async (req) => {
+  // fail-closed: CRON_SECRET 미설정이거나 헤더 불일치면 무조건 거부
   const secret = Deno.env.get("CRON_SECRET");
-  if (secret && req.headers.get("x-cron-secret") !== secret) {
+  if (!secret || req.headers.get("x-cron-secret") !== secret) {
     return json({ error: "unauthorized" }, 401);
   }
 
