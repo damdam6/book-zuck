@@ -1,0 +1,8 @@
+{
+  "head_sha": "1970488632259ab0a66553904b9023beabc08ddc",
+  "generated_at": "2026-06-14",
+  "rows": [
+    { "module_path": "src/ (App.tsx, Api-Test.tsx, main.tsx)", "output_slug": "ui", "mode": "create", "current_sha": "c7c1c6e1e114fadefdc21b8d9084952c1a7f1ddc" },
+    { "module_path": "src/lib", "output_slug": "lib", "mode": "create", "current_sha": "c7c1c6e1e114fadefdc21b8d9084952c1a7f1ddc" }
+  ]
+}
