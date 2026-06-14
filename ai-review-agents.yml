@@ -10,11 +10,11 @@ agents:
     temperature: 1
   security:
     provider: anthropic
-    model: claude-opus-4-7
+    model: claude-opus-4-8
     prompt_file: prompts/security.md
   orchestrator:
-    provider: google
-    model: gemini-2.5-flash
+    provider: anthropic
+    model: claude-haiku-4-5
     prompt_file: prompts/orchestrator.md
     max_tokens: 8192
   resolver:
