@@ -110,13 +110,15 @@ Deno.serve(async (req) => {
     auth: { persistSession: false },
   });
   const id = crypto.randomUUID();
-  const objectKey = `${user.id}/${id}/${fileName}`;
+  // 경로 구분자를 제거하고 basename만 사용(경로 조작 방지, 객체 키 위생)
+  const safeName = fileName.split(/[\\/]/).pop() || "audio";
+  const objectKey = `${user.id}/${id}/${safeName}`;
 
   const { error: insertError } = await admin.from("transcriptions").insert({
     id,
     user_id: user.id,
     r2_object_key: objectKey,
-    file_name: fileName,
+    file_name: safeName,
     file_size: fileSize,
     status: "uploading",
     config: DEFAULT_CONFIG,
