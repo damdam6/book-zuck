@@ -291,5 +291,5 @@ const clientSecret = Deno.env.get("RTZR_CLIENT_SECRET")!;
 6. **RLS 세부:** 결정 #5에 따라 보류 — v1 최소 안전 정책(예: 인증된 사용자만 자기
    row insert/select)인가, 완전 공개인가?
 7. **클라이언트 파일 크기 상한:** R2는 사실상 무제한이나 RTZR 한도(2GB·4시간)와
-   Edge 스트리밍 한계를 고려해 UI 상한을 정한다(예: 500MB 권장).
+   Edge 메모리 한계를 고려해 UI 상한을 **200MB**로 둔다(blob 메모리 적재 기준).
 ```

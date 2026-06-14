@@ -17,7 +17,7 @@ type Utterance = {
 };
 
 const ALLOWED_EXT = ["mp4", "m4a", "mp3", "amr", "flac", "wav"];
-const MAX_SIZE = 500 * 1024 * 1024; // 500MB
+const MAX_SIZE = 200 * 1024 * 1024; // 200MB (Edge Function 메모리 한도 고려)
 const POLL_INTERVAL_MS = 3000;
 
 const formatTimestamp = (ms: number) => {
@@ -33,7 +33,7 @@ const validate = (file: File): string | null => {
     return "지원하지 않는 형식입니다. (mp3/wav/m4a/flac/amr/mp4)";
   }
   if (file.size > MAX_SIZE) {
-    return "파일이 너무 큽니다. 최대 500MB까지 가능합니다. (긴 녹음은 m4a/mp3 압축 권장)";
+    return "파일이 너무 큽니다. 최대 200MB까지 가능합니다. (긴 녹음은 m4a/mp3 압축 권장)";
   }
   return null;
 };
@@ -130,7 +130,7 @@ export function AudioStt() {
     <div className="mx-auto max-w-3xl p-6 space-y-4">
       <h1 className="text-2xl font-bold">음성 → 한국어 전사 (임시)</h1>
       <p className="text-sm text-gray-500">
-        음성 파일(mp3/wav/m4a/flac/amr/mp4, 최대 500MB)을 업로드하면 한국어로
+        음성 파일(mp3/wav/m4a/flac/amr/mp4, 최대 200MB)을 업로드하면 한국어로
         전사합니다. 긴 녹음은 m4a/mp3 압축을 권장합니다.
       </p>
 

@@ -12,7 +12,9 @@ import { AwsClient } from "npm:aws4fetch@1.0.20";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const ALLOWED_EXT = ["mp4", "m4a", "mp3", "amr", "flac", "wav"];
-const MAX_SIZE = 500 * 1024 * 1024; // 500MB
+// Edge Function이 파일을 blob으로 메모리에 적재해 RTZR에 전달하므로(메모리 한도 ~256MB)
+// 상한을 현실적으로 200MB로 둔다. 휴대폰 m4a 1.5시간(~130MB)은 여유, 대형 WAV는 차단.
+const MAX_SIZE = 200 * 1024 * 1024; // 200MB
 
 // 화자분리 자동(spk_count=0), 한국어 sommers 모델
 const DEFAULT_CONFIG = {
@@ -99,7 +101,7 @@ Deno.serve(async (req) => {
   }
   if (typeof fileSize !== "number" || fileSize <= 0 || fileSize > MAX_SIZE) {
     return json(
-      { error: "invalid_size", message: "파일 크기가 허용 범위를 벗어났습니다(최대 500MB)." },
+      { error: "invalid_size", message: "파일 크기가 허용 범위를 벗어났습니다(최대 200MB)." },
       400,
     );
   }

@@ -25,7 +25,7 @@
   세부 권한 정책은 추후 반복.
 - **파일 전달:** `stt-submit`이 R2에서 받은 파일을 **`FormData`로 통째로** RTZR에
   전달(참고 `sttClient.ts`와 동일, RTZR 검증 방식). 메모리 적재 제약이 있어 UI는
-  압축 포맷(m4a/mp3) 권장 + 파일 크기 상한(기본 **500MB**)으로 대형 WAV를 막는다.
+  압축 포맷(m4a/mp3) 권장 + 파일 크기 상한(기본 **200MB**, Edge 메모리 한도 고려)으로 대형 WAV를 막는다.
 - **RTZR config 기본값:** `model_name=sommers`, `language=ko`,
   `use_diarization=true`, `diarization.spk_count=0`(자동).
 - **테스트:** v1은 **수동 검증**(프론트·Edge 모두). 자동화 러너 미도입.
@@ -93,7 +93,7 @@
 
 | 리스크 | 영향 | 완화 |
 |--------|------|------|
-| 대형 WAV가 Edge Function 메모리 한계 초과(FormData 메모리 적재) | 높음 | UI 포맷 권장(m4a/mp3) + 크기 상한(500MB); 한계 시 청크/별도 워커; 배포 후 실측 |
+| 대형 WAV가 Edge Function 메모리 한계 초과(blob 메모리 적재) | 높음 | UI 포맷 권장(m4a/mp3) + 크기 상한(200MB); 한계 시 청크/별도 워커; 배포 후 실측 |
 | RTZR 폴링 429(A0003) | 중 | 10초 주기, `stt-poll`에 백오프; tick당 작업 수 제한 |
 | presigned URL 오남용/만료 | 중 | 짧은 만료(예: 5분), 로그인 사용자만 발급, 객체 키에 user_id 강제 |
 | R2 자격증명 노출 | 높음 | 서버 시크릿만 사용, `VITE_` 금지, `grep` 검증 |
