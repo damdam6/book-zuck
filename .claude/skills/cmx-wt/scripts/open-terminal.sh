@@ -2,7 +2,7 @@
 # open-terminal.sh — Create a cmux workspace with 2 panes (top 2/3 + bottom 1/3), 4 tabs.
 #
 # Layout:
-#   Pane 1 (top, 67%):  tab1=cclw, tab2=codex
+#   Pane 1 (top, 67%):  tab1=claude, tab2=codex
 #   Pane 2 (bottom, 33%): tab3=pnpm cmd, tab4=empty shell
 #
 # Usage:
@@ -86,7 +86,7 @@ LAYOUT_JSON=$(cat <<EOJSON
   "split": 0.67,
   "children": [
     {"pane": {"surfaces": [
-      {"type": "terminal", "command": "cclw"},
+      {"type": "terminal", "command": "cmux claude-teams"},
       {"type": "terminal", "command": "codex"}
     ]}},
     {"pane": {"surfaces": [
@@ -103,7 +103,7 @@ echo "=== cmux 워크스페이스 생성 ==="
 echo "  worktree:    $WORKTREE_DIR"
 echo "  cmux 이름:   $WORKSPACE_NAME"
 [[ -n "$WS_COLOR" ]] && echo "  색상:        $WS_COLOR"
-echo "  Pane 1 (상단 67%): cclw, codex"
+echo "  Pane 1 (상단 67%): claude, codex"
 echo "  Pane 2 (하단 33%): pnpm, shell"
 echo
 
@@ -139,7 +139,7 @@ fi
 
 # 3) Rename tabs
 # Collect surfaces from all panes in order (pane1 surfaces, then pane2 surfaces)
-TAB_NAMES=("cclw" "codex" "pnpm" "shell")
+TAB_NAMES=("claude" "codex" "pnpm" "shell")
 
 if (( DRY_RUN )); then
   echo "[dry-run] rename tabs: ${TAB_NAMES[*]}"

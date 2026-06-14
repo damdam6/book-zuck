@@ -4,7 +4,7 @@ description: >
   Bootstrap a git worktree + cmux workspace in one shot. Takes a free-form mix of
   a task description (Korean or English) and an optional git issue (number, #NNN,
   or GitHub issue URL), then creates a branch, worktree, and cmux workspace with
-  2 panes and 4 tabs (Pane1: cclw + codex, Pane2: pnpm + shell).
+  2 panes and 4 tabs (Pane1: claude + codex, Pane2: pnpm + shell).
   Trigger on "새 작업 시작", "워크스페이스 만들어줘", "feature 만들어줘",
   "worktree랑 cmux 같이 열어줘", or any message that pairs a task description
   with an issue reference — even without explicitly mentioning "cmux" or "worktree".
@@ -23,7 +23,7 @@ Parse natural-language input, derive deterministic values, hand off to shell scr
 | Worktree | `.worktrees/{slug}/` | `.worktrees/add-sso-login-button/` |
 | cmux workspace | `{abbr}` | `sso-login` |
 | Repo pill | `{short}` via custom metadata | `FE` (icon: paintbrush.fill) |
-| Pane 1 (상단 67%) | tab1: cclw, tab2: codex | — |
+| Pane 1 (상단 67%) | tab1: claude, tab2: codex | — |
 | Pane 2 (하단 33%) | tab3: pnpm, tab4: shell | — |
 
 ## Parsing Rules
@@ -122,7 +122,7 @@ Include new-repo alias registration in the same confirmation — do not split in
 - Color:       Blue
 - Symlink:     .claude/skills, .claude/settings.local.json
 - Copy env:    apps/main-web/.env.development.local
-- Pane 1 (상단 67%): cclw, codex
+- Pane 1 (상단 67%): claude, codex
 - Pane 2 (하단 33%): pnpm install + pnpm main, shell
 
 Proceed?

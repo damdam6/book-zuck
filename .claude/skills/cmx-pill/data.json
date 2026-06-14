@@ -1,0 +1,9 @@
+{
+  "_comment": "Pill presets. Same key = mutually exclusive (auto-replace). Different keys = coexist.",
+  "presets": {
+    "wait": {"key": "status", "text": "wait", "icon": "pause.circle.fill", "color": "#7D6608", "priority": 90},
+    "ing":  {"key": "status", "text": "ing",  "icon": "hammer.fill",        "color": "#AD1457", "priority": 90},
+    "done": {"key": "status", "text": "done", "icon": "checkmark.circle.fill", "color": "#196F3D", "priority": 90},
+    "docs": {"key": "status", "text": "docs", "icon": "doc.text.fill",      "color": "#6A1B9A", "priority": 90}
+  }
+}
