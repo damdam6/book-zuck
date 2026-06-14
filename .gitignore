@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Use pnpm — keep a single lockfile
+package-lock.json
+yarn.lock
+
 # Git worktrees
 .worktrees/
 
