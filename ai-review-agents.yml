@@ -9,14 +9,16 @@ agents:
     prompt_file: prompts/performance.md
     temperature: 1
   security:
-    provider: anthropic
-    model: claude-opus-4-7
+    provider: kimi
+    model: kimi-k2.7-code
     prompt_file: prompts/security.md
+    temperature: 1
   orchestrator:
-    provider: google
-    model: gemini-2.5-flash
+    provider: kimi
+    model: kimi-k2.6
     prompt_file: prompts/orchestrator.md
     max_tokens: 8192
+    temperature: 1
   resolver:
     provider: deepseek
     model: deepseek-v4-pro
@@ -24,9 +26,10 @@ agents:
     temperature: 1
     confidence_threshold: 0.8
   responder:
-    provider: anthropic
-    model: claude-sonnet-4-6
+    provider: kimi
+    model: kimi-k2.6
     prompt_file: prompts/responder.md
+    temperature: 1
 
 triggers:
   review_on: [opened, reopened]
