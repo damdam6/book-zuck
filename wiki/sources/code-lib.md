@@ -4,44 +4,46 @@ type: source
 source_path: "src/lib"
 source_kind: "code"
 module: "lib"
-context: "data-access"
-last_ingested_sha: "c7c1c6e1e114fadefdc21b8d9084952c1a7f1ddc"
-created: "2026-06-14"
-ingested_at: "2026-06-14"
-entities: ["supabase"]
-concepts: []
-related: ["code-ui"]
+context: null
+last_ingested_sha: "87ad773082bf879d36e1286dc5ef251d73e7d8ea"
+created: "2026-06-20"
+ingested_at: "2026-06-20"
+entities: ["supabase", "shadcn-ui"]
+concepts: ["ui-data-fetching", "design-system"]
+related: ["supabase", "ui-data-fetching", "design-system", "adr-0001-use-supabase-backend"]
 ---
 
 # Data Access module (lib)
 
-The Data Access module (`src/lib`) is the data layer of 북적이(book-zuck). At
-present it consists of a single file, `src/lib/supabaseClient.ts`, which
-constructs and exports the shared Supabase client used across the app.
+`src/lib/` holds two shared, app-wide singletons.
 
-The client is created with `createClient(supabaseUrl, supabaseKey)` from
-`@supabase/supabase-js`. Both values are read from Vite environment variables:
-`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Because the key is the public
-**anon** key and is read via `import.meta.env`, it is bundled into the
-client-side build — access control therefore relies on Supabase Row Level
-Security rather than secrecy of the key.
+`supabaseClient.ts` constructs and exports the single Supabase client
+(`createClient(supabaseUrl, supabaseAnonKey)` from `@supabase/supabase-js`). Both
+values come from Vite env vars `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`,
+and the module now throws at import time if either is missing
+(`src/lib/supabaseClient.ts:7-11`). Because the **anon** key is bundled into the
+client build, access control depends on Supabase Row Level Security rather than
+key secrecy — the decision recorded in [[adr-0001-use-supabase-backend]]. The
+exported `supabase` singleton is the only integration point with the backend; it
+serves data queries ([[ui-data-fetching]]), Auth ([[google-oauth-session]]), and
+Edge Function calls ([[audio-transcription-pipeline]]).
 
-The exported `supabase` singleton is the single integration point between the app
-and the Supabase backend; UI components (see [[code-ui]]) import it directly to
-run queries. There is no repository/abstraction layer yet — callers use the
-Supabase query builder inline.
+`utils.ts` exports `cn(...)` — the standard shadcn class-merge helper
+(`clsx` + `tailwind-merge`) used by every [[shadcn-ui]] primitive in
+[[code-components]].
 
 ## Key takeaways
 
-- Single responsibility: build and export the shared `supabase` client.
-- Credentials come from Vite env vars (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`).
-- Uses the public anon key in the client bundle → security depends on Supabase RLS.
-- No repository abstraction yet; consumers call the Supabase query builder directly.
+- One Supabase client for the whole app; no repository/data-access abstraction wraps it (callers import `supabase` directly).
+- Fail-fast env validation prevents a silently-misconfigured client.
+- `cn()` is infrastructure for the design system, not domain logic.
 
 ## Affected wiki pages
 
 - [[supabase]]
+- [[ui-data-fetching]]
+- [[adr-0001-use-supabase-backend]]
 
 ## Citation
 
-`src/lib/supabaseClient.ts`
+`src/lib/supabaseClient.ts:1-13`, `src/lib/utils.ts:1-6`

@@ -1,45 +1,40 @@
 ---
 title: "UI data fetching"
 type: concept
-context: "ui"
-created: "2026-06-14"
-related: ["code-ui", "code-lib", "supabase"]
+context: null
+created: "2026-06-20"
+related: ["code-lib", "supabase", "audio-transcription-pipeline", "adr-0001-use-supabase-backend"]
 ---
 
 # UI data fetching
 
 ## Definition
 
-The pattern by which 북적이 UI components load remote data from Supabase. As
-captured in [[code-ui]], a component triggers a query on mount and stores the
-result in local React state. It defines *how the UI currently gets its data* —
-directly, per-component, without a caching/query layer.
+How 북적이 components read remote data: a component calls the shared Supabase
+client directly (no caching/query layer), typically in a `useEffect`, and stores
+rows in local React state. It defines *how the UI gets its data today* — directly,
+per-component.
 
 ## Architecture / Mechanism
 
-In `src/Api-Test.tsx:15`, a `useEffect` runs once on mount and calls
-`supabase.from("books").select("*")`, then writes the returned rows into
-`useState` (`src/Api-Test.tsx:13`). Rendering maps over the state array. The
-shared client comes from the [[code-lib]] module (`src/lib/supabaseClient.ts`),
-not from the component itself.
-
-This is explicitly a temporary approach — `src/Api-Test.tsx:11` notes that
-TanStack Query is intended to replace the manual `useEffect` fetch. The planned
-move would add request caching, loading/error states, and refetching that the
-current inline pattern lacks.
+The legacy reference is `src/Api-Test.tsx`: a `useEffect` runs
+`supabase.from("books").select("*")` on mount and writes rows into `useState`.
+The client comes from [[code-lib]], not the component. This component is marked
+temporary (TanStack Query intended later) and is no longer routed; the scaffolded
+[[code-pages]] do not yet fetch at all.
 
 ## Contrast
 
-vs the planned TanStack Query approach — manual `useEffect` fetching has no
-caching, dedup, or built-in loading/error handling; it is a placeholder.
+vs [[audio-transcription-pipeline]] — that path is async/polling through Edge
+Functions; this is plain synchronous table reads. Both share the one Supabase
+client and the RLS posture from [[adr-0001-use-supabase-backend]].
 
 ## Sources
 
-- [[code-ui]]
 - [[code-lib]]
+- [[supabase]]
 
 ## Code touchpoints
 
-- `src/Api-Test.tsx:15` — `useEffect` mount fetch
-- `src/Api-Test.tsx:17` — `supabase.from("books").select("*")`
-- `src/Api-Test.tsx:13` — result stored in `useState`
+- `src/Api-Test.tsx` — `useEffect` → `supabase.from("books").select("*")` → `useState`
+- `src/AudioStt.tsx:61` — `from("transcriptions").select(...)` (read side of the pipeline)
