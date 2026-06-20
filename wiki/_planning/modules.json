@@ -1,10 +1,9 @@
 {
-  "ui": {
-    "last_ingested_sha": "c7c1c6e1e114fadefdc21b8d9084952c1a7f1ddc",
-    "ingested_at": "2026-06-14"
-  },
-  "lib": {
-    "last_ingested_sha": "c7c1c6e1e114fadefdc21b8d9084952c1a7f1ddc",
-    "ingested_at": "2026-06-14"
-  }
+  "src/components": { "last_ingested_sha": "87ad773082bf879d36e1286dc5ef251d73e7d8ea", "ingested_at": "2026-06-20" },
+  "src/hooks": { "last_ingested_sha": "d52febee2da923c3741fc7f57a28c727a91e09f5", "ingested_at": "2026-06-20" },
+  "src/lib": { "last_ingested_sha": "87ad773082bf879d36e1286dc5ef251d73e7d8ea", "ingested_at": "2026-06-20" },
+  "src/pages": { "last_ingested_sha": "87ad773082bf879d36e1286dc5ef251d73e7d8ea", "ingested_at": "2026-06-20" },
+  "src/App.tsx": { "last_ingested_sha": "2ca1b4e67c82e5483667d57f08bbb232875f98d8", "ingested_at": "2026-06-20" },
+  "src/AudioStt.tsx": { "last_ingested_sha": "2ca1b4e67c82e5483667d57f08bbb232875f98d8", "ingested_at": "2026-06-20" },
+  "context-glossary": { "last_ingested_sha": "06b1e3b2036907a25f856d34eb6e61fcd39633db", "ingested_at": "2026-06-20" }
 }
