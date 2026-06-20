@@ -48,7 +48,7 @@ ssot.adrs = [
 
 ssot.modules = [
   {path: "src/orders", context: null | <bc-slug>, current_sha: <git rev-list -1>,
-   last_ingested_sha: <from wiki/_planning/modules.json or null>},
+   last_ingested_sha: <from wiki/_planning/modules.json[<path>] or null>},
   ...
 ]
 ```
@@ -103,7 +103,7 @@ For each path:
 - `docs/adr/*.md` + per-context `src/<bc>/docs/adr/*.md` → list ADR records (number from filename prefix, slug from rest, title from H1)
 - Enumerate `src/<bc>/` (multi) or `src/` (single) depth-1 dirs as modules
 - For each module, `git rev-list --max-count=1 HEAD -- <path>` for `current_sha`
-- Read `wiki/_planning/modules.json` for `last_ingested_sha`
+- Read `wiki/_planning/modules.json[<module-path>]` for `last_ingested_sha` (keyed by module path, never by slug; see DATA-MODEL.md). ADR SHAs live in `wiki/_planning/adrs.json[<adr-path>]`
 
 ### 3. Build graph
 

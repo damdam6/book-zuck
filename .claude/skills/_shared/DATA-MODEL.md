@@ -32,7 +32,14 @@
 - `wiki/_proposals/` — ingest extract candidates awaiting promotion
   - `term-<x>.md` — candidate glossary additions
   - `adr-<y>.md` — candidate ADRs (grill-with-docs 3-criteria pre-filtered)
-- `wiki/_planning/modules.json` — `module → last_ingested_sha` map
+- `wiki/_planning/` — skill bookkeeping (never hand-edited):
+  - `modules.json` — `module-path → {last_ingested_sha, ingested_at}` map, **keyed by module path** (e.g. `"src/components"`), plus the special `"context-glossary"` key for the CONTEXT.md snapshot. Never keyed by slug/name.
+  - `adrs.json` — `adr-path → {last_ingested_sha, ingested_at}` map (e.g. `"docs/adr/0001-x.md"`). ADR SHA tracking lives here, not in `modules.json`.
+  - `.ingest-manifest.json` / `.ingest-manifest.last.json` — `/repo-wiki-ingest` extract manifest (live, then rotated on success).
+  - `.last-check.json` — `/repo-wiki-check` delta snapshot for next-run diffing.
+  - `.rebuild-manifest.jsonl`, `.rebuild-{entities,concepts,synthesis}.todo.jsonl`, `.phase-*-complete` — `/repo-wiki-rebuild` transient pipeline state (cleaned up in finalize).
+
+  > **Key convention:** `modules.json` (code + `context-glossary`) and `adrs.json` (ADRs) are keyed by SSOT path. `/repo-wiki-ingest`, `/repo-wiki-update`, and `/repo-wiki-rebuild` all read/write with these identical key shapes.
 
 ### Deployment layer
 

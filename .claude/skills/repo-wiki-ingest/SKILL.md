@@ -110,11 +110,14 @@ Enumerate target modules:
 - Single-context: depth-1 dirs under `src/`
 - Multi-context: depth-1 dirs under each `src/<bc>/`
 
+> **Planning-key convention (shared with `/repo-wiki-update` and `/repo-wiki-rebuild`):**
+> `wiki/_planning/modules.json` is keyed by **module path** (e.g. `"src/components"`) — never by slug/name — plus the special `"context-glossary"` key for the CONTEXT snapshot. ADRs are tracked separately in `wiki/_planning/adrs.json`, keyed by **ADR file path** (e.g. `"docs/adr/0001-x.md"`). All three skills read and write these files with the same key shapes.
+
 For each module:
 
 ```
-current_sha   = $(git rev-list --max-count=1 HEAD -- src/<module>/)
-last_ingested = wiki/_planning/modules.json[<module>].last_ingested_sha   # null if absent
+current_sha   = $(git rev-list --max-count=1 HEAD -- src/<module-path>/)
+last_ingested = wiki/_planning/modules.json[<module-path>].last_ingested_sha   # null if absent
 mode          = "create" if last_ingested is null
               | "update" if current_sha != last_ingested
               | "skip"   otherwise
@@ -124,11 +127,11 @@ Build the manifest as a list of `(module_path, output_slug, mode)`. Filter out `
 
 ADRs are also ingest sources:
 
-- For each `docs/adr/<nnnn>-<slug>.md` (+ per-context), check whether `wiki/sources/adr-<nnnn>-<slug>.md` exists and matches the ADR file's git SHA — same skip/create/update logic
+- For each `docs/adr/<nnnn>-<slug>.md` (+ per-context), compare its current SHA (`git rev-list -1 HEAD -- <adr-path>`) against `wiki/_planning/adrs.json[<adr-path>].last_ingested_sha` — same create/update/skip logic. (Create `adrs.json` if absent.)
 
 CONTEXT snapshot is also a source:
 
-- Compute hash of CONTEXT.md (and per-context CONTEXT.md files); compare against `wiki/_planning/modules.json["context-glossary"].last_ingested_sha`
+- Compute the SHA of CONTEXT.md (and per-context CONTEXT.md files); compare against `wiki/_planning/modules.json["context-glossary"].last_ingested_sha`
 
 #### B.2 Parallel fan-out (wave-based throttling)
 
@@ -157,7 +160,7 @@ After all waves complete:
 
 1. **Deduplicate cross-module concept pages.** If multiple modules emitted `<module>-payment-aggregate.md` for the same underlying pattern, merge into a single `wiki/concepts/payment-aggregate.md` and update the constituent modules' `wiki/sources/code-<m>.md` to cite it.
 2. **Update `wiki/index.md`** with new entries under Sources / Concepts / Entities / Proposals sections (yq + Edit).
-3. **Update `wiki/_planning/modules.json`** — for each ingested row, write `{module: {last_ingested_sha: <sha>, ingested_at: <date>}}`.
+3. **Update `wiki/_planning/modules.json`** — for each ingested code row, write `{<module-path>: {last_ingested_sha: <sha>, ingested_at: <date>}}`; for the CONTEXT snapshot, write the `"context-glossary"` key. For each ingested ADR row, write `{<adr-path>: {last_ingested_sha, ingested_at}}` to `wiki/_planning/adrs.json` (create if absent). (See the planning-key convention in B.1.)
 4. **Append `wiki/log.md`:**
    ```
    ## [{YYYY-MM-DD}] ingest --extract | {N} sources, {C} concepts, {E} entities, {Pt} term-proposals, {Pa} adr-proposals
