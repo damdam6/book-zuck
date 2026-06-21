@@ -9,7 +9,9 @@ on:
     types: [created]
 
 concurrency:
-  group: ai-review-${{ github.event.pull_request.number || github.event.issue.number }}
+  # 이벤트별로 그룹을 분리해, 코멘트로 트리거된 실행이 진행 중인 PR 리뷰 실행을
+  # 취소(자기취소 → 빨간 체크)하지 않도록 한다. (ai-code-review-action#7)
+  group: ai-review-${{ github.event.pull_request.number || github.event.issue.number }}-${{ github.event_name }}
   cancel-in-progress: true
 
 permissions:
@@ -19,12 +21,15 @@ permissions:
 
 jobs:
   review:
-    if: github.event.pull_request.draft == false
+    if: >-
+      (github.event_name == 'pull_request' && github.event.pull_request.draft != true) ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && github.event.comment.user.type != 'Bot') ||
+      (github.event_name == 'pull_request_review_comment' && github.event.comment.user.type != 'Bot')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: damdam6/ai-code-review-action@v1.0.0
+      - uses: damdam6/ai-code-review-action@v1.0.1
         with:
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
           google-api-key: ${{ secrets.GOOGLE_API_KEY }}
