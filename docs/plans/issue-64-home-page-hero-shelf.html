@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>#64 [M1] 홈 페이지 — 히어로 책장 + 떨어지는 글자 + 가로 책장 — 작업 플랜</title>
+<style>
+  :root {
+    --bg: #f7f7f8; --card: #ffffff; --ink: #1c1c1e; --muted: #6e6e73;
+    --line: #e3e3e6; --accent: #3b6ef5; --accent-soft: #e8eefe;
+    --ok: #2e8b57; --warn: #b25e09; --code-bg: #f0f0f2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161618; --card: #202024; --ink: #ececf0; --muted: #98989f;
+      --line: #333338; --accent: #7a9bff; --accent-soft: #26304a;
+      --ok: #58c088; --warn: #e0a35c; --code-bg: #2a2a2f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 40px 20px 80px; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+                 "Segoe UI", "Noto Sans KR", sans-serif;
+    line-height: 1.65;
+  }
+  main { max-width: 860px; margin: 0 auto; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 0.86em;
+    background: var(--code-bg); border-radius: 5px; padding: 2px 6px;
+  }
+  header { margin-bottom: 28px; }
+  .issue-chip {
+    display: inline-block; font-weight: 700; color: var(--accent);
+    background: var(--accent-soft); border-radius: 999px;
+    padding: 3px 14px; font-size: 0.95rem; margin-bottom: 10px;
+  }
+  .type-chip {
+    display: inline-block; font-weight: 600; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 3px 12px; font-size: 0.8rem; margin-left: 8px; vertical-align: 2px;
+  }
+  h1 { font-size: 1.7rem; margin: 0 0 14px; letter-spacing: -0.02em; }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 6px 22px;
+    color: var(--muted); font-size: 0.87rem;
+  }
+  .meta b { color: var(--ink); font-weight: 600; }
+  section.card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 24px 28px; margin-top: 18px;
+  }
+  h2 {
+    font-size: 1.05rem; margin: 0 0 14px; letter-spacing: -0.01em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  h2 .no {
+    color: var(--accent); font-size: 0.8rem; font-weight: 700;
+    border: 1.5px solid var(--accent); border-radius: 6px; padding: 0 6px;
+  }
+  ul, ol { margin: 0; padding-left: 22px; }
+  li { margin: 6px 0; }
+  .steps { list-style: none; padding: 0; counter-reset: step; }
+  .steps li {
+    counter-increment: step; position: relative; padding: 10px 0 10px 44px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .steps li:last-child { border-bottom: none; }
+  .steps li::before {
+    content: counter(step); position: absolute; left: 0; top: 10px;
+    width: 28px; height: 28px; border-radius: 8px; background: var(--accent-soft);
+    color: var(--accent); font-weight: 700; font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .steps .files { display: block; margin-top: 4px; font-size: 0.85rem; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 0.82rem; }
+  .done-list { list-style: none; padding: 0; }
+  .done-list li { padding-left: 30px; position: relative; }
+  .done-list li::before {
+    content: ""; position: absolute; left: 2px; top: 7px; width: 15px; height: 15px;
+    border: 2px solid var(--ok); border-radius: 5px;
+  }
+  .steps li.done::before { content: "✓"; background: var(--ok); border-color: var(--ok); color: #fff; }
+  .step-note { display: block; margin-top: 6px; font-size: 0.85rem; color: var(--warn); }
+  .scroll-x { overflow-x: auto; }
+  footer { margin-top: 30px; color: var(--muted); font-size: 0.8rem; text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="issue-chip"><a href="https://github.com/damdam6/book-zuck/issues/64">#64</a></span><span class="type-chip">기능 개선</span>
+    <h1>[M1] 홈 페이지 — 히어로 책장 + 떨어지는 글자 + 가로 책장</h1>
+    <div class="meta">
+      <span><b>damdam6/book-zuck</b></span>
+      <span>브랜치 <b><code>feat/64-home-page-hero-shelf</code></b> ← <code>main</code></span>
+      <span>라벨 <b>enhancement</b></span>
+      <span>2026-09-24</span>
+    </div>
+  </header>
+
+  <section class="card">
+    <h2><span class="no">1</span>요약</h2>
+    <p>현재 <code>src/pages/Home/HomePage.tsx</code>는 제목과 텍스트 링크만 있는 placeholder다.
+    이 작업은 PRD §7-1을 따라 히어로 책장(스티커 2장 포함), 떨어지는 글자(Glyph Drop) 물리
+    애니메이션, 날짜순 가로 책장(책등 펼침/카드 확장), 하단 장식 섹션을 구현한다. M0(#63, PR #67)에서
+    이미 병합된 브랜드 토큰(<code>--font-hand</code>, <code>orange-500 #e8412f</code>,
+    <code>participant-1..9</code>)과 공통 셸(<code>TheHeader</code>, <code>BrandLogo</code>)은
+    재사용하고 다시 만들지 않는다. 데이터는 M3 완료 전까지 목업 17권을 쓰고, Club 상세(M5)는
+    아직 스펙이 없으므로 카드 클릭 이동 대상만 최소 placeholder로 채운다.</p>
+  </section>
+
+  <section class="card">
+    <h2><span class="no">2</span>현황 분석</h2>
+    <ul>
+      <li><code>src/pages/Home/HomePage.tsx:1</code> — <code>TheHeader</code> + 제목 + 플레이스홀더
+        내비게이션 링크만 존재. 히어로·Glyph Drop·가로 책장·하단 장식 모두 미구현.</li>
+      <li><code>src/components/common/TheHeader.tsx</code>, <code>src/components/common/BrandLogo.tsx</code> —
+        M0에서 헤더(GNB)·모바일 탭바·로고 SVG 인라인이 이미 완성되어 있다. 이 이슈에서 재구현하지
+        않고 <code>&lt;TheHeader /&gt;</code>만 마운트한다.</li>
+      <li><code>src/index.css:1-95</code> — 브랜드 팔레트(<code>--color-orange-500: #e8412f</code>),
+        <code>participant-1..9</code>, <code>--font-hand</code>, <code>--font-sankofa</code>,
+        반응형 브레이크포인트 토큰(<code>--breakpoint-compact: 720px</code>,
+        <code>--breakpoint-desktop: 1100px</code>, <code>--breakpoint-wide: 1200px</code>,
+        <code>--width-shell: 1440px</code>)까지 M0에서 이미 등록됨. Glyph Drop에 필요한 초록·노랑·남색
+        3색만 이번 이슈에서 추가 토큰이 필요하다(§3 참고).</li>
+      <li><code>src/pages/Bookshelf/BookshelfPage.tsx</code> — 아직 placeholder(M2 범위). 히어로 스티커
+        `책장`과 카드 클릭이 목표로 삼는 <code>/bookshelf</code>는 이번 이슈에서 완성되지 않는다는
+        점을 감안해 링크만 정확히 연결한다.</li>
+      <li><code>src/App.tsx:9-23</code> — 라우트 5개 등록(<code>/</code>, <code>/bookshelf</code>,
+        <code>/books/:bookId/agenda</code>, <code>/agenda/new</code>, <code>/my</code>). <b>Club
+        라우트(<code>/clubs/:clubId</code>)가 아직 없다</b> — 가로 책장 카드 클릭 시 이동할 곳이 없어
+        완료 조건("카드 클릭 → Club 이동")을 만족할 수 없다.</li>
+      <li>목업 데이터 부재 — <code>src/pages/Bookshelf</code>·<code>src/pages/Home</code> 어디에도
+        책/모임 목업 배열이 없다. 참고 프로토타입
+        <code>docs/design/buckzuck-bookclub.dc.html:341-379</code>에 17권(책 8권 상세 + extra 9권)
+        분량의 샘플 데이터가 있다.</li>
+      <li>물리 애니메이션 로직 — 같은 프로토타입 <code>docs/design/buckzuck-bookclub.dc.html:402-454</code>
+        (<code>startFx()</code>)에 낙하·책등 충돌·바닥선 정지 로직이 완전한 형태로 있다. 단,
+        프로토타입은 장식용 SVG 낙서(삼각형·상자·지그재그·K자)를 사용하고, 이번 이슈는 PRD §7-1에 따라
+        실제 텍스트 글자(<code>--font-sankofa</code>)를 낙하시켜야 하므로 페이로드만 교체해 이식한다.</li>
+      <li>스크롤 버튼 동작 — 같은 파일 508-514행: <code>scrollBy(window.innerWidth * 0.6)</code>로
+        "뷰포트 60%"를 구현. 펼침 시 카드를 가로 중앙 + 세로 화면 안으로 스크롤하는 로직은 480행에
+        있다.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2><span class="no">3</span>설계</h2>
+    <ul>
+      <li><b>글자 구성·색(OQ5) 확정</b> — PRD §11 OQ5는 미결이지만 권장안이 명시돼 있다
+        (<code>docs/PRD.md:428</code>): 히어로 4자 <code>B U C K</code>, 하단 3자 <code>Z U C</code>,
+        색은 point → 초록 → 노랑 → 남색 순환. 이번 작업에서 이 권장안을 채택해 진행한다(사용자
+        지정: "끝까지" 진행 승인). 색상 3종(<code>#1f8a1f</code>, <code>#F2C400</code>,
+        <code>#1d2a7a</code>)은 기존 <code>green-700</code>/<code>yellow-700</code>과 값이 달라
+        <code>--color-glyph-green</code> / <code>--color-glyph-yellow</code> / <code>--color-glyph-navy</code>
+        3개 토큰을 <code>src/index.css</code> "point &amp; 보조" 블록에 신규 등록한다(M0 재작업이
+        아니라 M1에서 새로 드러난 필요 — 컴포넌트에 생 hex를 쓰지 않는다는 §4 원칙을 지킨다).</li>
+      <li><b>책 표지 스파인 색은 토큰 대상이 아니라 콘텐츠 데이터</b> — 브랜드 크롬(장식용 회색
+        책등·바닥선·스티커 등)은 반드시 <code>neutral-*</code>/<code>orange-500</code>/<code>coral-300</code>
+        토큰을 쓰지만, 가로 책장의 책별 스파인 색(프로토타입의 책마다 다른 hex)은 향후
+        <code>books.cover_url</code>(§8)로 대체될 콘텐츠 값이라 목업 데이터 파일 안에서만 hex를
+        허용한다. 컴포넌트 JSX 안에 인라인 hex를 직접 쓰지 않고 데이터에서 주입되는 값만 스타일에
+        바인딩한다.</li>
+      <li><b>Glyph Drop 컨테이너 스코프는 프로토타입과 동일하게 2단</b> — 히어로 레이어(4자)는
+        히어로 섹션과 가로 책장 섹션을 함께 감싸는 하나의 relative 박스 위에 절대 배치하고, 그 박스
+        내부의 모든 <code>data-ob</code>(책등)·<code>data-floor</code>(바닥선)를 충돌 대상으로 삼는다
+        (프로토타입 <code>heroRef</code>가 <code>&lt;main&gt;</code> 전체를 감싸는 것과 동일한 이유:
+        글자가 히어로 책등뿐 아니라 가로 책장 책등에도 튕겨야 함). 하단 레이어(3자)는 하단 장식
+        섹션만 감싸는 별도 박스이며, 실제 <code>data-floor</code> 요소 없이 박스 하단 자체를 합성
+        바닥으로 쓴다(프로토타입 <code>bottomRef</code> + <code>floorY = cr.height</code> 동일 이식).</li>
+      <li><b>물리 로직은 range를 그대로 이식</b> — 중력 0.55/프레임(정규화 dt 기준), 책등 충돌 시
+        수평 이탈(6회 초과 시 <code>front=true</code>로 앞으로 빼서 계속 낙하), 바닥선에서 vy·vx·vr
+        감쇠 후 정지, 화면 밖(위/좌/우로 크게 벗어남)이면 제거. <code>requestAnimationFrame</code>
+        단일 루프, 프레임마다 <code>getBoundingClientRect()</code>로 재계산해 스크롤 중에도 좌표가
+        어긋나지 않게 한다(가로 책장 스크롤이 히어로 레이어 박스 안에 있으므로 특히 중요).
+        <code>prefers-reduced-motion: reduce</code>면 낙하를 건너뛰고 바로 바닥 위치 + ±3° 고정
+        회전으로 배치한다(<code>matchMedia</code> 체크, 애니메이션 훅과 별개로 판정).</li>
+      <li><b>히어로 반응형 스케일은 CSS로 불연속 재현</b> — PRD 공식
+        <code>cw≥1100 ? 1 : clamp(0.55, (cw-40)/760, 0.85)</code>를
+        <code>scale(clamp(0.55, calc((100vw - 40px) / 760), 0.85))</code> 기본 + <code>desktop:</code>
+        (≥1100px)에서 <code>scale(1)</code> 오버라이드로 구현해 JS 리사이즈 리스너 없이 처리한다.
+        1099→1100px 경계에서 0.85→1.0으로 점프하는 것은 프로토타입과 동일한 의도된 동작이다.</li>
+      <li><b>가로 책장 펼침/이동은 클릭 2단(expand → direct)</b> — PRD·완료 조건 문구("책등 클릭 →
+        카드 펼침 → 카드 클릭 → Club")를 그대로 따라 <code>clickBehavior=expand</code> 동작만
+        구현한다(프로토타입의 <code>direct</code> 모드는 이식하지 않음 — 옵션으로 노출할 필요가
+        없는 확정 동작). 펼침 시 가로 스크롤 컨테이너를 카드가 중앙에 오도록, 세로는 카드가 뷰포트
+        안에 들어오도록 스크롤(프로토타입 480행 로직 이식).</li>
+      <li><b>Club 상세는 placeholder 1개만 추가</b> — M5(#는 별도 이슈)에서 다룰 범위지만, 카드
+        클릭 이동 없이는 완료 조건을 검증할 수 없다. 기존 <code>BookAgendaPage</code>·<code>MyPage</code>와
+        동일한 얇은 placeholder 패턴(<code>TheHeader</code> + 제목 + TODO 주석)으로
+        <code>src/pages/Club/ClubPage.tsx</code>를 추가하고 <code>/clubs/:clubId</code> 라우트만
+        연결한다. Club 페이지 자체 설계는 이 이슈의 범위가 아니다.</li>
+      <li><b>1440 컨테이너 테두리는 Home 로컬 스코프</b> — PRD §4-5의 "max 1440 중앙 정렬 + `0 0 0
+        1px #eee` 테두리"는 사이트 공통 셸을 새로 만들 근거가 아직 없으므로(다른 페이지는 모두
+        placeholder) 이번 이슈에서는 <code>HomePage</code>의 <code>&lt;main&gt;</code> 래퍼에만
+        <code>max-w-(--width-shell) mx-auto</code> + 테두리를 적용한다. 다른 페이지 공통화는 필요
+        시 후속 이슈로 분리한다.</li>
+      <li><b>로딩/빈/에러 상태는 목업 페칭 훅으로 표현</b> — <code>useHomeClubs()</code> 훅이
+        <code>{status:'loading'|'success'|'empty'|'error', data}</code>를 반환하도록 만들고, 목업
+        구현은 짧은 지연 후 항상 <code>success</code>로 17권을 반환한다. 빈/에러 상태 UI는 실제로
+        만들어 두되, M1 시점엔 자연 발생하지 않으므로 테스트는 목업 배열을 일시적으로 비우거나 상태를
+        강제해 수동 확인한다(§6 테스트 계획). M3에서 Supabase 훅으로 교체될 때 이 상태 계약을 그대로
+        따른다.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2><span class="no">4</span>작업 단계</h2>
+    <ol class="steps">
+      <li class="done">Glyph Drop용 브랜드 토큰 3종(<code>--color-glyph-green</code>,
+        <code>--color-glyph-yellow</code>, <code>--color-glyph-navy</code>) 추가. 기존
+        <code>orange-500</code>과 함께 4색 순환 팔레트를 구성한다.
+        <span class="files"><code>src/index.css</code></span>
+      </li>
+      <li class="done">홈 목업 데이터 모듈 작성 — <code>HomeClubEntry</code> 타입(책 제목·저자·출판사·표지 유무·
+        일시·장소·참여 인원·발제 5개·스파인 색·스파인 폭)과 프로토타입 17권을 이식한 배열, 날짜
+        오름차순 정렬 helper, <code>useHomeClubs()</code> 상태 훅(loading/success/empty/error)을
+        만든다.
+        <span class="files"><code>src/pages/Home/data/clubBooks.ts</code>, <code>src/pages/Home/hooks/useHomeClubs.ts</code></span>
+      </li>
+      <li class="done">Club 상세 placeholder 페이지와 라우트 추가 — 가로 책장 카드 클릭 이동 대상을 만든다.
+        <span class="files"><code>src/pages/Club/ClubPage.tsx</code>, <code>src/App.tsx</code></span>
+      </li>
+      <li class="done">Glyph Drop 물리 훅 작성 — 컨테이너 ref·바닥 모드(dom 탐색 vs 합성 바닥)·글자 배열(글자·색·
+        지연시간)을 입력받아 매 프레임 위치·회전·정지 여부를 계산하는 순수 로직. 프로토타입
+        <code>startFx()</code>의 중력·충돌·정지·제거 규칙을 그대로 이식하되 SVG 낙서 대신 문자
+        페이로드를 다룬다. <code>prefers-reduced-motion</code> 분기 포함.
+        <span class="files"><code>src/pages/Home/glyphDrop/useGlyphDropPhysics.ts</code></span>
+        <span class="step-note">실기 확인 중 발견: 낙하 거리가 긴 컨테이너에서 프레임당 이동량이
+        바닥선 두께(12px)를 넘어 터널링(충돌 없이 통과)하는 사례를 확인해, 종단 속도 상한(11px/프레임)을
+        추가했다. 프로토타입엔 없던 안전장치.</span>
+      </li>
+      <li class="done">Glyph Drop 렌더 레이어 컴포넌트 — 훅 결과를 <code>--font-sankofa</code> 120px/400/lh150%/
+        ls-3% 텍스트 span으로 절대 배치, <code>aria-hidden</code> 처리(순수 장식).
+        <span class="files"><code>src/pages/Home/glyphDrop/GlyphDropLayer.tsx</code>, <code>src/pages/Home/glyphDrop/letters.ts</code></span>
+      </li>
+      <li class="done">HeroShelf 컴포넌트 — 좌측 책등 6권(회색 4단계는 <code>neutral-*</code> 토큰, 흰색, 붉은
+        point 책등에 북마크 탭), 붉은 책등 위 스티커 2장(<code>발제</code> → 가로 책장 섹션
+        <code>scrollIntoView</code>, <code>책장</code> → <code>/bookshelf</code> 링크 + 하단
+        point 밑줄), wide(≥1200)에서만 보이는 우측 책등 묶음, 바닥선(12px 검정, wide는 260px 간격
+        2분할), 반응형 scale(설계 §3) 적용. 각 책등에 <code>data-ob</code> 대응 마커를 달아 Glyph
+        Drop 충돌 대상이 되게 한다.
+        <span class="files"><code>src/pages/Home/components/HeroShelf.tsx</code></span>
+        <span class="step-note">실기 확인 중 발견: <code>clamp()</code> 공식에서 <code>100vw</code>
+        (길이)를 <code>760</code>(단위 없는 숫자)로 나누면 CSS 타입 오류로 전체 값이 무효화되어
+        compact 구간(720~1099px)에서 히어로 전체가 렌더링되지 않는 버그가 있었다. 나눗셈 분모에
+        <code>760px</code>로 단위를 붙여 길이÷길이=숫자가 되도록 고쳤다.</span>
+      </li>
+      <li class="done">HorizontalShelf 컴포넌트 — 날짜 오름차순 책등 목록(폭 44~66, 높이
+        <code>540 + (제목길이%3)*30</code>/모바일 <code>320 + …*26</code>, hover -14px), 클릭 시
+        펼침 카드(760×620 데스크톱 / 세로 300 모바일, 표지 영역 + 제목·날짜·저자·출판사·발제 5개·
+        참여인원·장소, 재클릭 시 <code>/clubs/:clubId</code> 이동), 펼침 시 가로 중앙 + 세로 뷰포트
+        안 스크롤, 좌우 원형 버튼(48px, 반투명 흰+blur, <code>window.innerWidth*0.6</code>만큼
+        스크롤), 바닥선(좌측 33% 들여쓰기, 모바일 0), 로딩 스켈레톤 8개·빈 상태(점선 책등 1개 + 안내
+        문구)·에러 상태(인라인 메시지 + 다시 시도 버튼)를 <code>useHomeClubs()</code> 상태에 따라
+        분기 렌더링.
+        <span class="files"><code>src/pages/Home/components/HorizontalShelf.tsx</code>, <code>src/pages/Home/components/ShelfSkeleton.tsx</code>, <code>src/pages/Home/components/ShelfEmptyState.tsx</code>, <code>src/pages/Home/components/ShelfErrorState.tsx</code></span>
+      </li>
+      <li class="done">BottomDecoration 컴포넌트 — WELCOME 아웃라인 책등, 코랄 <code>DOKSEO ARCHIVE</code> 책등,
+        데스크톱 전용 회전 회색 책등, 중앙 알약형 placeholder 4개 + 코랄 스티커(그림자
+        <code>12px 14px 0 neutral-600</code>), 순수 장식(<code>aria-hidden</code>). 두 번째 Glyph
+        Drop 레이어(3자)를 이 섹션 박스 위에 배치.
+        <span class="files"><code>src/pages/Home/components/BottomDecoration.tsx</code></span>
+      </li>
+      <li class="done">HomePage 조립 — <code>TheHeader</code> + 1440 컨테이너 래퍼(mx-auto + 테두리) +
+        히어로/가로 책장 공용 relative 박스(히어로 Glyph 레이어 포함) + <code>HorizontalShelf</code> +
+        <code>BottomDecoration</code>(자체 Glyph 레이어 포함) 순서로 배치. 마운트 0.4s 후 물리
+        애니메이션을 시작하도록 지연 트리거를 건다(프로토타입 <code>setTimeout(…, 400)</code> 동일
+        이식).
+        <span class="files"><code>src/pages/Home/HomePage.tsx</code></span>
+        <span class="step-note">실기 확인 중 발견: 모바일(&lt;720px)에서 고정 하단 탭바가 하단 장식
+        마지막 pill을 가려, <code>&lt;main&gt;</code>에 <code>pb-16 compact:pb-0</code>을 추가했다
+        (PRD §6-2 "본문 padding-bottom: 64px 확보"를 Home에도 적용).</span>
+      </li>
+      <li class="done">반응형·접근성·품질 게이트 확인 — 1440/1200/1100/1099/720/719/390px 수동 확인,
+        <code>prefers-reduced-motion</code> 에뮬레이션 확인, 터치 타깃 44px 이상, 장식 요소
+        <code>aria-hidden</code>, <code>pnpm build</code>·<code>pnpm lint</code> 통과.
+        <span class="files"><code>src/pages/Home/**</code></span>
+      </li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2><span class="no">5</span>리스크</h2>
+    <div class="scroll-x">
+    <table>
+      <thead><tr><th>리스크</th><th>영향</th><th>완화책</th></tr></thead>
+      <tbody>
+        <tr><td>rAF 물리 루프가 스크롤/리사이즈와 겹치며 프레임마다 다수의
+          <code>getBoundingClientRect()</code> 호출 → 저사양 기기에서 버벅임</td>
+          <td>LCP·체감 성능 저하</td>
+          <td>화면 밖 요소 즉시 제거, 정지(<code>resting</code>)한 글자는 매 프레임 재계산 대상에서
+          제외, 필요 시 <code>requestIdleCallback</code> 없이도 단일 루프 유지로 충분한지 실기기(또는
+          Chrome throttling)로 확인</td></tr>
+        <tr><td>OQ5(글자 구성·색)가 PRD상 공식 미결 상태에서 권장안으로 진행</td>
+          <td>디자인 승인 후 값이 바뀌면 재작업 필요</td>
+          <td>글자·색 배열을 <code>letters.ts</code> 한 파일에 격리해 변경 비용을 최소화, 플랜에 채택
+          근거 명시</td></tr>
+        <tr><td>가로 책장 카드 클릭이 가리키는 <code>/clubs/:clubId</code>가 아직 실제 페이지 없음(M5
+          미착수)</td>
+          <td>완료 조건 "카드 클릭 → Club 이동"을 검증할 수 없음</td>
+          <td>기존 placeholder 패턴과 동일한 최소 Club 페이지 1개만 추가, 본설계는 M5에서 별도 진행</td></tr>
+        <tr><td>목업 책 스파인 색(콘텐츠 hex)과 "컴포넌트에 생 hex 금지" 브랜드 원칙이 표면적으로
+          충돌</td>
+          <td>리뷰 시 오해 소지</td>
+          <td>플랜에 데이터-vs-브랜드크롬 구분 근거를 명시하고, 실제 hex는 데이터 파일에만 존재하도록
+          구현(컴포넌트는 데이터가 주는 값을 바인딩만 함)</td></tr>
+        <tr><td>히어로 scale 공식이 1099→1100px 경계에서 불연속 점프</td>
+          <td>일부 뷰포트에서 어색해 보일 수 있음(프로토타입 의도)</td>
+          <td>프로토타입과 동일 동작임을 플랜에 명시, QA 체크리스트에 720/1099/1100/1200 경계값 포함</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="no">6</span>테스트 계획</h2>
+    <ul>
+      <li><code>pnpm build</code>, <code>pnpm lint</code> 통과 확인.</li>
+      <li>데스크톱 1440px — 헤더 로고 노출, 히어로 스티커 <code>발제</code> 클릭 시 가로 책장
+        섹션으로 부드럽게 스크롤, <code>책장</code> 클릭 시 <code>/bookshelf</code> 이동.</li>
+      <li>1200px(wide) — 히어로 우측 코랄/회색 책등 묶음과 바닥선 2분할(260px 간격) 노출 확인.</li>
+      <li>1100~1199px(desktop, wide 아님) — 히어로 원본 크기(scale 1), 우측 묶음 숨김.</li>
+      <li>720~1099px(compact) — 히어로가 0.55~0.85 사이로 축소되는지, 720px 근접값에서 nav가
+        탭바로 전환되는 경계와 겹치지 않는지 확인.</li>
+      <li>390px(mobile) — 카드가 세로 배치(<code>300×auto</code>, 커버 상단 180px), 히어로 최소
+        축소, 하단 탭바 노출, 가로 책장 간격 40/최소 높이 380 적용 확인.</li>
+      <li>Glyph Drop — 히어로 4자 + 하단 3자가 낙하해 책등에서 옆으로 튕기고 바닥선에서 ±3° 내로
+        정지하는지, 책등 사이에 여러 번 끼면 앞으로 빠져나와 계속 떨어지는지, 화면 밖으로 나간 글자가
+        제거되는지 육안 확인.</li>
+      <li>DevTools에서 <code>prefers-reduced-motion: reduce</code> 에뮬레이트 후 재진입 — 글자가
+        애니메이션 없이 최종 위치(바닥, ±3° 고정)에 바로 놓이는지 확인.</li>
+      <li>책등 클릭 → 카드 펼침(가로 중앙 + 세로 화면 안 스크롤) → 같은 카드 재클릭 → <code>/clubs/:id</code>
+        placeholder로 이동 확인.</li>
+      <li>좌우 원형 버튼 클릭 시 <code>window.innerWidth*0.6</code>만큼 부드럽게 스크롤되는지 확인.</li>
+      <li>로딩 상태 — 훅의 지연 구간에서 책등 자리 스켈레톤 8개가 잠깐 보이는지 확인.</li>
+      <li>빈 상태 — <code>clubBooks.ts</code> 배열을 임시로 비우고(커밋하지 않음) 점선 책등 1개 +
+        "첫 모임을 등록해 보세요" 문구 노출 확인 후 원복.</li>
+      <li>에러 상태 — 훅 내부에서 일시적으로 <code>status:'error'</code>를 강제해(커밋하지 않음)
+        인라인 에러 메시지 + 다시 시도 버튼이 뜨고, 클릭 시 재조회되는지 확인 후 원복.</li>
+      <li>회귀 확인 — 헤더 로그인/로그아웃, 헤더 nav 활성 표시, 모바일 탭바가 기존과 동일하게
+        동작하는지(이번 변경으로 <code>TheHeader</code>를 건드리지 않으므로 회귀 없어야 함).</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2><span class="no">7</span>완료 조건</h2>
+    <ul class="done-list">
+      <li>로고 SVG가 헤더에 뜨고(M0 재사용) 스티커 2개가 각각 가로 책장 스크롤 / <code>/bookshelf</code>
+        이동으로 동작한다.</li>
+      <li>글자 4+3개가 <code>--font-sankofa</code> 텍스트로 떨어져 책등에 튕기고 바닥선에 멈춘다.
+        <code>prefers-reduced-motion</code>에서는 즉시 바닥 위치에 놓인다.</li>
+      <li>책등 클릭 → 카드 펼침(가로 중앙 + 세로 화면 안 스크롤) → 카드 클릭 → Club(placeholder)
+        이동. 좌우 버튼으로 뷰포트 60%씩 스크롤된다.</li>
+      <li>720px 미만에서 카드가 세로 배치되고 히어로가 축소된다. 1200px 이상에서는 히어로 우측 책등
+        묶음이 추가로 보인다.</li>
+      <li>로딩 스켈레톤 8개, 빈 상태(점선 책등 + 안내 문구), 에러 상태(인라인 메시지 + 다시 시도)가
+        모두 구현되어 있고 수동으로 트리거해 확인 가능하다.</li>
+      <li><code>pnpm build</code>·<code>pnpm lint</code> 통과.</li>
+    </ul>
+  </section>
+
+  <footer>issue-plan · <a href="https://github.com/damdam6/book-zuck/issues/64">#64</a> · 2026-09-24</footer>
+</main>
+</body>
+</html>
