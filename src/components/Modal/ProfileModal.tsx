@@ -1,12 +1,20 @@
 // src/components/Modal/ProfileModal.tsx
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/hooks/useAuth";
 
-const ProfileModal = () => {
+const ProfileModal = ({ onNavigate }: { onNavigate?: () => void }) => {
   const { name, email, profile } = useAuth();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    onNavigate?.();
+  };
+
+  const handleGoMyPage = () => {
+    navigate("/my");
+    onNavigate?.();
   };
 
   return (
@@ -28,7 +36,10 @@ const ProfileModal = () => {
       <hr className="w-full border-gray-500" />
 
       {/* 마이페이지 */}
-      <button className="w-full text-left text-white cursor-pointer py-1">
+      <button
+        className="w-full text-left text-white cursor-pointer py-1"
+        onClick={handleGoMyPage}
+      >
         마이페이지
       </button>
 

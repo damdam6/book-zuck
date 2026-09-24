@@ -79,7 +79,7 @@ CSS에 **기존 브랜드 팔레트에 없는 색**이 다수 등장. 토큰 추
 | B2 | `BookMetaHeader` | 제목(64) + 저자(37) + 공유 액션 묶음 | custom 조합 |
 | B3 | `InfoRow` | 아이콘(캘린더/핀, ~25px) + 라벨(300/20) + 값(Work Sans/20) | custom |
 | B4 | `AvatarGroup` | 참여자 49px 원 가로 나열(간격 ~64px) + 라벨 people 아이콘 | custom |
-| B5 | `ParticipantAvatar` ⭐ | 49px 원, `color` bg, 선택 시 `5px #F83C00` 링, white는 `1px #C0C0C0` 보더; 군집용 39px 변형 | custom |
+| B5 | `ParticipantAvatar` ⭐ | 49px 원, `color` bg, 선택 시 `5px #E8412F` 링, white는 `1px #C0C0C0` 보더; 군집용 39px 변형 | custom |
 
 ### C. 발제 섹션 (유형별 tone 적용)
 | # | 컴포넌트 | 실측·역할 | 구현 |
@@ -100,7 +100,7 @@ CSS에 **기존 브랜드 팔레트에 없는 색**이 다수 등장. 토큰 추
 | D1 | `CommentThread` | `tone` 배경 틴트(예 `#FFDADA`/`#E6E6E6`)·722px 영역·내부 스크롤·하단 collapse | custom + shadcn Collapsible |
 | D2 | `ChatBubble` ⭐ | 흰 말풍선(r20) + 꼬리(Polygon) + 작성자 색 태그(r `0 20 20 0`) + 메시지(500/22) | custom |
 | D3 | `AuthorTag` ⭐ | 작성자 색 라벨(우영=`#0B0404`/흰글씨, 수빈=green·blue/색글씨) — `color`(필수) | custom |
-| D4 | `LikeButton` | 하트(채워짐 `#F83C00` point / 빈 `#A3A3A3`) + 카운트(16) | custom |
+| D4 | `LikeButton` | 하트(채워짐 `#E8412F` point / 빈 `#A3A3A3`) + 카운트(16) | custom |
 | D5 | `Collapsible` / `CollapseChevron` | 19×8 쉐브론(`#9C9C9C`) 펼치기/접기 | shadcn (add collapsible) |
 
 ### E. 인용 / 하이라이트
