@@ -38,6 +38,7 @@
   --color-purple-300: #dac3f4;
   --color-indigo-300: #a9b3e8;
   --color-coral-300: #ffa77b;
+  --color-tape: rgb(160 200 230 / 0.7); /* 스티커 상단 테이프 (PRD §4-4 형태·모션) */
 
   /* glyph-drop — 홈 히어로 낙하 글자 전용 4색 순환 중 3색(1색은 orange-500 재사용) (PRD §7-1 OQ5) */
   --color-glyph-green: #1f8a1f;
