@@ -1,6 +1,6 @@
 # 북적북적(BUCKZUCK) PRD — 페이지 단위 개발
 
-> 버전: v1.1 (2026-09-24) · 상태: **초안 — 검토 대기** (OQ4 확정 반영)
+> 버전: v1.2 (2026-09-24) · 상태: **초안 — 검토 대기** (OQ3·OQ4 확정 반영)
 > 작성 기준: Claude Design 프로토타입 「독서모임 웹사이트 프로토타입」 `Buckzuck Bookclub.dc.html`
 > (https://claude.ai/design/p/05aa83a2-ccea-43cf-a18c-b01aa0c7d212?file=Buckzuck+Bookclub.dc.html)
 > 스냅숏: `docs/design/buckzuck-bookclub.dc.html` · 로고 원본: `src/assets/brand/logo.svg`
@@ -102,9 +102,23 @@
 | 본문/UI(한글) | Noto Sans KR | `--font-sans` (Pretendard) | 확정 |
 | 로고 | Major Mono Display | SVG 로고 | 확정 |
 | 떨어지는 글자 | SVG 도형 | `--font-sankofa` 120px | 확정(사용자 지정) |
-| 손글씨 제목(책장/발제/모임 기록/내 책장/다음 모임/모바일 탭) | Nanum Pen Script | **신규 `--font-hand`** | ⚠️ OQ3 — Figma 토큰 스펙에 없음. 유지 권장 |
+| 손글씨 제목(책장/발제/모임 기록/내 책장/다음 모임/모바일 탭) | Nanum Pen Script | **신규 `--font-hand`** | ✅ OQ3 확정 — 채택 |
 | 라틴/숫자(날짜·라벨) | Noto Sans KR | `--font-work` | design-tokens 결정 유지 |
 | 책등 장식 문구 | Georgia | `--font-work` | 장식용, 자유 |
+
+> **손글씨 폰트 확정(OQ3):** **Nanum Pen Script**(나눔손글씨 펜 스크립트)를 채택하고
+> `--font-hand`로 등록한다. `design-tokens` 스펙의 폰트 5종에는 없던 **6번째 폰트**이며,
+> 테이프 스티커·기울어진 패널·떨어지는 글자와 함께 "손으로 쓴 독서노트" 인상을 만드는
+> 핵심 요소라 유지한다. 대체 후보가 없다는 점도 근거다 — Sankofa Display는 라틴 전용이고,
+> Padauk은 따옴표·태그라인용으로 역할이 다르다.
+>
+> 적용처는 **한글 제목·라벨 12곳**으로 한정한다: 홈 스티커 `발제`(54)·`책장`(50), 책장 제목
+> `책장`(52~72), Club `발제`(44)·`모임 기록`(44)·`모임 평점`(30), 마이 `다음 모임`(26)·
+> `내 책장`(44~56)·`내가 남긴 기록`(44), 모바일 탭 `홈`·`책장`·`마이`(각 28).
+> 본문·숫자·라틴에는 쓰지 않는다.
+>
+> 로딩은 기존 4종과 같은 방식(`index.html` 구글 폰트 `<link>`, `display=swap`)으로 추가한다.
+> 폴백은 `cursive`. `design-tokens` 스펙의 폰트 표에도 6번째 행으로 추가한다. (작업 항목: M0)
 
 ### 4-3. 색
 | 역할 | 프로토타입 | 구현 토큰 | 비고 |
@@ -385,7 +399,7 @@ Club 스펙에서 확정한다.
 
 | M | 범위 | 스펙 폴더 | 완료 정의 |
 |---|---|---|---|
-| **M0** | 브랜드·토큰 보강 + 공통 셸 | `app-shell` | 로고 SVG, **포인트 색 `#E8412F` 교체**, `--font-hand`, 참여자 9색, 브레이크포인트 토큰, 헤더·탭바, `ProfileModal→/my` |
+| **M0** | 브랜드·토큰 보강 + 공통 셸 | `app-shell` | 로고 SVG, **포인트 색 `#E8412F` 교체**, **`--font-hand`(Nanum Pen Script) 추가**, 참여자 9색, 브레이크포인트 토큰, 헤더·탭바, `ProfileModal→/my` |
 | **M1** | Home | `home-page` | 히어로·Glyph Drop·가로 책장(접힘/펼침)·장식, mock → Supabase 연동 |
 | **M2** | 책장 | `bookshelf-page` | 필터·검색·그리드·URL 동기화 |
 | **M3** | 데이터 기반 | (M1~M2와 병행) | `books` 확장, `clubs`·`club_participants`·`profiles`·`notes` 마이그레이션 + RLS |
@@ -403,6 +417,7 @@ M1·M2는 Supabase 스키마가 나오기 전까지 프로토타입의 샘플 �
 ### 결정 완료 (Resolved)
 | # | 질문 | 결정 | 반영 |
 |---|---|---|---|
+| OQ3 | 한글 손글씨 폰트(Nanum Pen Script) 채택 여부 | ✅ **채택** — `--font-hand` 신규 등록 | §4-2 — 제목·라벨 12곳 한정(M0) |
 | OQ4 | 포인트 색 `#E8412F`(프로토) vs `#F83C00`(토큰) | ✅ **`#E8412F`(프로토타입) 채택** | §4-3 — `--color-orange-500` 값 교체(M0) |
 
 ### 결정 필요 (Open)
@@ -410,7 +425,6 @@ M1·M2는 Supabase 스키마가 나오기 전까지 프로토타입의 샘플 �
 |---|---|---|---|
 | OQ1 | Club 페이지 상세 — 모임 등록·보여주기 시스템 | M5 전체 | 사용자 지정: 해당 페이지 개발 시 구체화 |
 | OQ2 | Book:Club 1:1 유지 vs 1:N(같은 책 재모임) → Agenda 소속 | 스키마·CONTEXT.md | 1:N 허용, Agenda는 Club 소속으로 변경 |
-| OQ3 | 한글 손글씨 폰트(Nanum Pen Script) 채택 여부 | 제목·탭바·스티커 | 채택(`--font-hand`), 디자이너 확인 |
 | OQ5 | 떨어지는 글자의 글자 구성·개수·색 4종 | Home | `B U C K` / `Z U C` 7자, 색은 프로토 4색 |
 | OQ6 | 발제 tone 시스템·OpinionViz를 Club에 통합할지 | M5·M6 | Club 발제 목록은 단순 리스트, 상세는 `/books/:bookId/agenda` 유지 |
 | OQ7 | Note 1인 1기록 여부, 수정 허용 | notes 제약 | 1인 1기록 + 수정 허용 |
@@ -426,3 +440,5 @@ M1·M2는 Supabase 스키마가 나오기 전까지 프로토타입의 샘플 �
   `src/assets/brand/logo.svg`, 프로토타입 스냅숏을 `docs/design/`에 보관.
 - 2026-09-24 v1.1 — **OQ4 확정: 포인트 색 = `#E8412F`**(프로토타입 값). 기존 토큰
   `--color-orange-500` 값을 교체하는 방식으로 반영하며, 실제 교체는 M0에서 수행한다.
+- 2026-09-24 v1.2 — **OQ3 확정: 손글씨 폰트 = Nanum Pen Script 채택**. `--font-hand`로 등록하고
+  한글 제목·라벨 12곳에 한정 적용한다. 남은 미결은 9건(OQ1·2·5~11).
