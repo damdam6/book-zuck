@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>#63 [M0] 브랜드 토큰 보강 + 공통 셸 (헤더·모바일 탭바) — 작업 플랜</title>
+<style>
+  :root {
+    --bg: #f7f7f8; --card: #ffffff; --ink: #1c1c1e; --muted: #6e6e73;
+    --line: #e3e3e6; --accent: #3b6ef5; --accent-soft: #e8eefe;
+    --ok: #2e8b57; --warn: #b25e09; --code-bg: #f0f0f2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161618; --card: #202024; --ink: #ececf0; --muted: #98989f;
+      --line: #333338; --accent: #7a9bff; --accent-soft: #26304a;
+      --ok: #58c088; --warn: #e0a35c; --code-bg: #2a2a2f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 40px 20px 80px; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+                 "Segoe UI", "Noto Sans KR", sans-serif;
+    line-height: 1.65;
+  }
+  main { max-width: 860px; margin: 0 auto; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 0.86em;
+    background: var(--code-bg); border-radius: 5px; padding: 2px 6px;
+  }
+  header { margin-bottom: 28px; }
+  .issue-chip {
+    display: inline-block; font-weight: 700; color: var(--accent);
+    background: var(--accent-soft); border-radius: 999px;
+    padding: 3px 14px; font-size: 0.95rem; margin-bottom: 10px;
+  }
+  .type-chip {
+    display: inline-block; font-weight: 600; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 3px 12px; font-size: 0.8rem; margin-left: 8px; vertical-align: 2px;
+  }
+  h1 { font-size: 1.7rem; margin: 0 0 14px; letter-spacing: -0.02em; }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 6px 22px;
+    color: var(--muted); font-size: 0.87rem;
+  }
+  .meta b { color: var(--ink); font-weight: 600; }
+  section.card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 24px 28px; margin-top: 18px;
+  }
+  h2 {
+    font-size: 1.05rem; margin: 0 0 14px; letter-spacing: -0.01em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  h2 .no {
+    color: var(--accent); font-size: 0.8rem; font-weight: 700;
+    border: 1.5px solid var(--accent); border-radius: 6px; padding: 0 6px;
+  }
+  ul, ol { margin: 0; padding-left: 22px; }
+  li { margin: 6px 0; }
+  .steps { list-style: none; padding: 0; counter-reset: step; }
+  .steps li {
+    counter-increment: step; position: relative; padding: 10px 0 10px 44px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .steps li:last-child { border-bottom: none; }
+  .steps li::before {
+    content: counter(step); position: absolute; left: 0; top: 10px;
+    width: 28px; height: 28px; border-radius: 8px; background: var(--accent-soft);
+    color: var(--accent); font-weight: 700; font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .steps .files { display: block; margin-top: 4px; font-size: 0.85rem; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 0.82rem; }
+  .done-list { list-style: none; padding: 0; }
+  .done-list li { padding-left: 30px; position: relative; }
+  .done-list li::before {
+    content: ""; position: absolute; left: 2px; top: 7px; width: 15px; height: 15px;
+    border: 2px solid var(--ok); border-radius: 5px;
+  }
+  .scroll-x { overflow-x: auto; }
+  footer { margin-top: 30px; color: var(--muted); font-size: 0.8rem; text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="issue-chip"><a href="https://github.com/damdam6/book-zuck/issues/63">#63</a></span><span class="type-chip">기능 개선</span>
+    <h1>[M0] 브랜드 토큰 보강 + 공통 셸 (헤더·모바일 탭바)</h1>
+    <div class="meta">
+      <span><b>damdam6/book-zuck</b></span>
+      <span>브랜치 <b><code>feat/63-brand-tokens-app-shell</code></b> ← <code>main</code></span>
+      <span>라벨 <b>enhancement</b></span>
+      <span>2026-09-24</span>
+    </div>
+  </header>
+
+  <section class="card">
+    <h2><span class="no">1</span>요약</h2>
+    <p>PRD v1.2 §10 마일스톤 <b>M0</b> — 모든 페이지가 올라탈 토대라 M1~M4보다 먼저 끝나야 한다.
+    <code>src/index.css</code>의 토큰(포인트 색·손글씨 폰트·참여자 9색·브레이크포인트)을 보강하고,
+    <code>index.html</code>에 구글 폰트를 추가하고, 제공된 브랜드 로고 SVG를 헤더에 적용하고,
+    5개 라우트가 공유하는 헤더/모바일 하단 탭바를 만든다. 마지막으로 두 스펙 문서의 hex 표기를
+    새 포인트 색에 맞춰 갱신한다.</p>
+  </section>
+
+  <section class="card">
+    <h2><span class="no">2</span>현황 분석</h2>
+    <ul>
+      <li><b>토큰</b> — <code>src/index.css:36</code>의 <code>--color-orange-500</code>이 아직 구 값
+        <code>#f83c00</code>이다(PRD §4-3 OQ4는 <code>#e8412f</code>로 확정). <code>--font-hand</code>,
+        <code>participant-1..9</code>, 반응형 브레이크포인트 토큰은 아직 존재하지 않는다.</li>
+      <li><b>폰트 로딩</b> — <code>index.html:15-18</code>은 Work Sans·Plus Jakarta Sans·Padauk·Sankofa
+        Display 4종만 구글 폰트 link로 로드한다. Nanum Pen Script가 없다.</li>
+      <li><b>로고</b> — <code>src/assets/brand/logo.svg</code>(107×51, path 2개)는 이미 리포에 있지만
+        아무 곳에서도 import되지 않는다. <code>fill="black"</code>이 두 군데(offset 55708, 111169)이고
+        루트 <code>&lt;svg&gt;</code>의 <code>fill="none"</code>은 그대로 둬야 한다.</li>
+      <li><b>헤더</b> — <code>src/components/common/TheHeader.tsx:23</code>는 로고 자리에 텍스트
+        "로고" placeholder만 있고 nav·활성 상태·모바일 탭바가 전혀 없다.</li>
+      <li><b>ProfileModal</b> — <code>src/components/Modal/ProfileModal.tsx:31-33</code>의 "마이페이지"
+        버튼에 <code>onClick</code>이 없어 미연결 상태다(이슈에도 명시).</li>
+      <li><b>인증 갱신</b> — <code>src/hooks/useAuth.ts:13</code>은 이미
+        <code>supabase.auth.onAuthStateChange</code>를 구독해 <code>session</code> state를 갱신하고
+        <code>TheHeader</code>는 이 훅을 그대로 소비한다. 완료 조건의 "로그인/로그아웃 후 헤더 즉시 갱신"은
+        구조적으로 이미 충족되어 있다 — 리라이트 중 이 구독 방식만 유지하면 된다.</li>
+      <li><b>페이지 5곳 모두 헤더를 개별 호출</b> — <code>HomePage</code>·<code>BookshelfPage</code>·
+        <code>BookAgendaPage</code>·<code>AgendaNewPage</code>·<code>MyPage</code>가
+        <code>page-based-folder-structure</code> 스펙 컨벤션대로 각자 <code>&lt;TheHeader /&gt;</code>를
+        최상단에서 호출한다(예: <code>src/pages/Home/HomePage.tsx:8</code>). 즉 <code>TheHeader</code>
+        컴포넌트 자체만 고치면 5개 페이지 파일은 건드리지 않아도 자동 반영된다.</li>
+      <li><b>스펙 문서</b> — <code>docs/specs/design-tokens/spec.md</code>에 <code>#F83C00</code>이
+        4곳(line 55, 61, 63, 168), <code>docs/specs/book-agenda-view/spec.md</code>에 2곳(line 82
+        <code>ParticipantAvatar</code> 선택 링, line 103 <code>LikeButton</code>)이 있다. 이슈 체크리스트는
+        "선택 링" 표기만 명시하지만 두 줄 다 같은 <code>point</code> 토큰을 가리키므로 함께 갱신하지
+        않으면 <code>design-tokens</code> 스펙이 이미 경고한 near-duplicate hex 문제가 재발한다.</li>
+      <li><b>환경</b> — 이 워크트리에는 <code>node_modules</code>가 아직 설치돼 있지 않다(Tailwind
+        v4.2.2, SVGR 플러그인은 미설치). <code>eslint.config.js</code>에 jsx-a11y 플러그인이 없어
+        <code>dangerouslySetInnerHTML</code> 사용 자체는 린트 이슈를 일으키지 않는다.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2><span class="no">3</span>설계</h2>
+    <ul>
+      <li><b>브레이크포인트 토큰</b> — PRD §4-5의 5단계 중 4개를 Tailwind v4 <code>@theme</code>의
+        <code>--breakpoint-*</code>로 등록한다: <code>--breakpoint-compact: 720px</code>,
+        <code>--breakpoint-desktop: 1100px</code>, <code>--breakpoint-wide: 1200px</code>.
+        "mobile &lt;720"은 별도 토큰을 만들지 않고 Tailwind v4가 <code>--breakpoint-compact</code>로부터
+        자동 생성하는 <code>max-compact:</code> variant(<code>(max-width: 719.98px)</code>)로 표현한다 —
+        중복 토큰을 피하는 선택. "max 1440"은 반응형 분기점이 아니라 컨테이너 상한이므로 breakpoint가
+        아닌 별도 폭 토큰 <code>--width-shell: 1440px</code>로 등록한다.</li>
+      <li><b>로고</b> — 원본 asset <code>logo.svg</code>의 <code>fill="black"</code> 2곳을 파일에서 직접
+        <code>fill="currentColor"</code>로 바꾼다(PRD §4-1 문구 그대로). 컴포넌트에서는 Vite 내장
+        <code>?raw</code> import(추가 의존성 불필요)로 SVG 마크업 문자열을 가져와 인라인 렌더링한다.
+        <code>&lt;img src&gt;</code>로 쓰면 <code>currentColor</code>가 항상 검정으로 고정돼 "검정 이외
+        맥락에서도 쓰기" 요구사항을 satisfy 못하므로 인라인이 필수다. 새 컴포넌트
+        <code>src/components/common/BrandLogo.tsx</code>에 <code>role="img" aria-label="북적북적"</code>로
+        접근성을 보강한다.</li>
+      <li><b>공통 셸</b> — <code>TheHeader</code>를 전면 리라이트해 데스크톱 헤더(로고+nav+로그인/아바타)와
+        모바일 하단 탭바를 한 컴포넌트가 함께 반환하게 한다. 탭바는 <code>position: fixed</code>이므로
+        DOM 순서와 무관하게 항상 뷰포트 하단에 그려진다 — 5개 페이지 파일을 건드리지 않고
+        <code>TheHeader</code> 한 곳만 고쳐도 모든 라우트에 전파된다. 활성 상태는 <code>useLocation()</code>
+        경로 prefix로 판별(<code>/</code>→홈, <code>/bookshelf</code> 또는 <code>/books/*</code>→책장,
+        <code>/my</code>→마이).</li>
+      <li><b>모바일 탭바 하단 여백</b> — PRD가 요구하는 "본문 <code>padding-bottom:64px</code>"은 5개
+        페이지의 <code>&lt;main&gt;</code>을 각각 고치는 대신 <code>src/index.css</code>에
+        <code>@media (max-width: 719px) { body { padding-bottom: 64px; } }</code> 한 줄을 추가해 전역
+        해결한다(대안이었던 "페이지별 main 클래스 수정"은 5파일 중복이라 기각).</li>
+      <li><b>ProfileModal 마이페이지 버튼</b> — <code>useNavigate()</code>로 <code>/my</code> 이동을
+        연결하고, <code>TheHeader</code>가 내려주는 <code>onNavigate</code> 콜백으로 드롭다운을 닫는다.</li>
+      <li><b>참여자 9색</b> — <code>@theme</code>에 <code>--color-participant-1</code>부터
+        <code>-9</code>까지 등록한다. 기존 팔레트 값은 <code>var(--color-coral-300)</code> 등으로
+        참조하고, 이슈가 명시한 신규 hex 2개(<code>#FAF4B0</code>, <code>#FFB5B5</code>)는 재사용 브랜드
+        팔레트가 아닌 참여자 전용 단발 색이라 별도 색이름을 만들지 않고 <code>participant-7</code>/
+        <code>participant-9</code> 리터럴로 등록한다. 소비 컴포넌트(<code>ParticipantAvatar</code>)는
+        <code>book-agenda-view</code> 스펙 소관이라 이번 범위 밖 — 토큰만 선등록한다.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2><span class="no">4</span>작업 단계</h2>
+    <ol class="steps">
+      <li>✅ 토큰 보강 — <code>--color-orange-500</code> 값을 <code>#f83c00</code>→<code>#e8412f</code>로
+        교체, <code>--font-hand: "Nanum Pen Script", cursive</code> 추가, <code>--color-participant-1..9</code>
+        등록, <code>--breakpoint-compact/desktop/wide</code> + <code>--width-shell: 1440px</code> 추가,
+        모바일 탭바용 <code>body</code> <code>padding-bottom</code> 미디어쿼리 추가.
+        <span class="files"><code>src/index.css</code></span>
+        <span class="files">참고: <code>participant-2..9</code>는 아직 소비 컴포넌트가 없어 Tailwind v4가
+          production 빌드에서 미사용 유틸을 tree-shaking함 — <code>@theme</code> 소스 등록은 완료, 빌드 산출물엔
+          실사용 시(M1+) 나타남. 정상 동작.</span>
+      </li>
+      <li>✅ 구글 폰트 — 기존 <code>&lt;link&gt;</code>의 <code>family=</code> 쿼리에
+        <code>Nanum+Pen+Script</code>를 병합(<code>display=swap</code> 유지, 폴백은 CSS
+        <code>--font-hand</code>가 담당).
+        <span class="files"><code>index.html</code></span>
+      </li>
+      <li>✅ 로고 asset 수정 — <code>fill="black"</code> 2곳을 <code>fill="currentColor"</code>로 교체
+        (루트 <code>fill="none"</code>은 유지).
+        <span class="files"><code>src/assets/brand/logo.svg</code></span>
+      </li>
+      <li>✅ <code>BrandLogo</code> 컴포넌트 신설 — <code>logo.svg?raw</code> import 후
+        <code>dangerouslySetInnerHTML</code>로 인라인, <code>className</code> prop으로 크기/색 제어,
+        <code>role="img" aria-label="북적북적"</code>.
+        <span class="files"><code>src/components/common/BrandLogo.tsx</code>(신규)</span>
+      </li>
+      <li>✅ <code>TheHeader</code> 전면 리라이트 — 좌측 로고(<code>Link to="/"</code>) + nav(책장/마이페이지,
+        활성 시 point 색+2px 밑줄) + 로그인 버튼(검정, r4, 최소높이 44)/로그인 상태 아바타+이름 +
+        <code>ProfileModal</code> 드롭다운. 같은 컴포넌트가 모바일 하단 탭바(홈/책장/마이, 높이 64,
+        <code>--font-hand</code> 28px + 점 인디케이터, safe-area 패딩)도 함께 반환. 컨테이너 최대폭은
+        <code>--width-shell</code>.
+        <span class="files"><code>src/components/common/TheHeader.tsx</code></span>
+        <span class="files">구현 시 확정: nav 표시/숨김은 PRD 반응형 표(§4-5)를 따라 <code>compact:</code>
+          (≥720px) 기준으로 전환(하드 "desktop"(≥1100px) 기준이 아님) — 이슈 완료 조건의 "720px 미만" 문구와
+          정확히 일치. 로그인 버튼/아바타는 모바일에서도 계속 보이고, nav 링크(책장/마이페이지)만 숨겨짐
+          (PRD §4-5 "헤더 nav 숨김"이 문자 그대로 nav만 가리킴). Playwright로 400px/1280px 양쪽 확인 완료.</span>
+      </li>
+      <li>✅ <code>ProfileModal</code> 마이페이지 버튼 연결 — <code>useNavigate()</code>로 <code>/my</code> 이동,
+        부모로부터 받은 닫힘 콜백 호출.
+        <span class="files"><code>src/components/Modal/ProfileModal.tsx</code>, <code>src/components/common/TheHeader.tsx</code></span>
+      </li>
+      <li>✅ <code>design-tokens</code> 스펙 갱신 — 폰트 표(§1)에 Nanum Pen Script/<code>--font-hand</code>
+        6번째 행 추가, <code>#F83C00</code> 4곳을 <code>#E8412F</code>로 교체.
+        <span class="files"><code>docs/specs/design-tokens/spec.md</code></span>
+      </li>
+      <li>✅ <code>book-agenda-view</code> 스펙 갱신 — 선택 링(§B5) <code>5px #F83C00</code>→
+        <code>5px #E8412F</code>, 같은 이유로 <code>LikeButton</code>(§D4)의 <code>#F83C00</code>도
+        함께 교체.
+        <span class="files"><code>docs/specs/book-agenda-view/spec.md</code></span>
+      </li>
+      <li>✅ 검증 — <code>pnpm install</code>(node_modules 없는 워크트리라 최초 1회 필요) →
+        <code>pnpm build</code> → <code>pnpm lint</code> → <code>pnpm dev</code> + Playwright(headless
+        Chromium, 임시 <code>npx</code> 설치·프로젝트 의존성에는 미포함)로 5라우트·모바일 탭바·콘솔 에러
+        확인.
+        <span class="files"><code>package.json</code>(스크립트 변경 없음, 실행만)</span>
+      </li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2><span class="no">5</span>리스크</h2>
+    <div class="scroll-x">
+    <table>
+      <thead><tr><th>리스크</th><th>영향</th><th>완화책</th></tr></thead>
+      <tbody>
+        <tr><td>로고를 <code>dangerouslySetInnerHTML</code>로 인라인</td>
+            <td>일반적이지 않은 패턴, 리뷰 시 XSS 우려 제기 가능</td>
+            <td>소스가 빌드 타임에 번들되는 리포 내 정적 파일(사용자 입력 아님)임을 컴포넌트에 짧은
+              주석으로 명시</td></tr>
+        <tr><td>신규 <code>--breakpoint-*</code> 토큰명이 Tailwind 기본 <code>sm/md/lg</code>와 겹치지 않는지</td>
+            <td>겹치면 기존 유틸리티가 깨짐</td>
+            <td>이름을 <code>compact/desktop/wide</code>로 분리(기본값과 겹치지 않음), <code>pnpm build</code>로
+              유틸 클래스 생성 여부 확인</td></tr>
+        <tr><td>워크트리에 <code>node_modules</code> 미설치</td>
+            <td><code>pnpm build</code>/<code>lint</code> 실행 전 설치가 선행돼야 함</td>
+            <td>검증 스텝 맨 앞에 <code>pnpm install</code> 배치</td></tr>
+        <tr><td><code>participant-1..9</code> 토큰은 소비 컴포넌트가 아직 없음</td>
+            <td>토큰만 등록되고 시각적으로 확인할 화면이 없음</td>
+            <td><code>pnpm build</code>로 유틸리티 클래스 생성만 확인, 실사용 검증은 M1+
+              <code>book-agenda-view</code> 구현에서</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="no">6</span>테스트 계획</h2>
+    <ul>
+      <li><code>pnpm install && pnpm build</code>(<code>tsc -b && vite build</code>) 통과 확인.</li>
+      <li><code>pnpm lint</code> 통과 확인.</li>
+      <li><code>pnpm dev</code> 실행 후 <code>/</code>, <code>/bookshelf</code>,
+        <code>/books/1/agenda</code>, <code>/agenda/new</code>, <code>/my</code> 5개 라우트 모두 동일한
+        헤더가 뜨는지, 로고 클릭 시 <code>/</code>로 이동하는지 확인.</li>
+      <li>브라우저 폭을 720px 미만으로 줄여 nav가 사라지고 하단 탭바가 뜨는지, 현재 라우트에 해당하는
+        탭이 point 색(<code>#E8412F</code>)으로 표시되는지 확인.</li>
+      <li>구글 로그인/로그아웃을 실제로 수행해 헤더가 즉시 리렌더(로그인 버튼 ↔ 아바타+이름 전환)되는지
+        회귀 확인(기존 <code>onAuthStateChange</code> 구독 경로 유지 검증).</li>
+      <li><code>ProfileModal</code>에서 "마이페이지" 클릭 → <code>/my</code> 이동 + 모달 닫힘 확인.</li>
+      <li>DevTools에서 <code>--color-orange-500</code> 계산값이 <code>#e8412f</code>인지, Network 탭에서
+        Nanum Pen Script 폰트 요청이 200으로 로드되는지 확인.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2><span class="no">7</span>완료 조건</h2>
+    <ul class="done-list">
+      <li>✅ 5개 라우트 모두 동일한 헤더가 뜨고 로고 클릭 시 홈으로 이동한다. — Playwright로 5라우트 전부
+        헤더 동일성 + 로고 클릭 확인.</li>
+      <li>✅ 720px 미만에서 nav가 사라지고 탭바가 뜨며 현재 탭이 point 색(<code>#E8412F</code>)으로
+        표시된다. — 400px 뷰포트에서 확인, 탭 클릭 시 활성 색 전환도 확인.</li>
+      <li>✅ 로그인/로그아웃 후 헤더가 즉시 갱신된다(<code>onAuthStateChange</code>). — 기존
+        <code>useAuth</code>의 구독 로직을 그대로 유지(코드 레벨 확인). 실제 구글 OAuth 로그인은 헤드리스
+        환경에서 재현 불가라 직접 클릭 테스트는 못함 — 사람이 브라우저에서 한 번 더 확인 권장.</li>
+      <li>✅ <code>pnpm build</code> · <code>pnpm lint</code>가 통과한다. — 빌드 성공(청크 크기 경고는
+        기존 이슈, 무관), lint 0 error(기존 shadcn 파일의 warning 2건은 무관).</li>
+      <li>✅ <code>src/index.css</code>에 포인트 색·<code>--font-hand</code>·participant 9색·브레이크포인트
+        토큰이 반영되고, <code>index.html</code> 구글 폰트 link에 Nanum Pen Script가 추가된다.</li>
+      <li>✅ 브랜드 로고 SVG가 <code>currentColor</code> fill로 헤더에 적용된다.</li>
+      <li>✅ <code>design-tokens</code>·<code>book-agenda-view</code> 두 스펙 문서의 hex 표기가
+        <code>#E8412F</code>로 갱신된다.</li>
+    </ul>
+  </section>
+
+  <footer>issue-plan · <a href="https://github.com/damdam6/book-zuck/issues/63">#63</a> · 2026-09-24</footer>
+</main>
+</body>
+</html>
